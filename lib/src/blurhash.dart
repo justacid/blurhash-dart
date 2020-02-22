@@ -59,14 +59,14 @@ Uint8List decodeBlurHash(
 
 /// Encodes an image to a BlurHash string
 ///
-/// The format of the given [data] array is epected to be raw pixels in RGBA32 format -
+/// The format of the given [data] array is expected to be raw pixels in RGBA32 format -
 /// without any additional image headers. The [width] and [height] are the dimensions of
-/// the given image. Paramters [numCompX] and [numCompY] are the components of the
+/// the given image. Parameters [numCompX] and [numCompY] are the components of the
 /// BlurHash. Both parameters must lie between 1 and 9.
 ///
 /// Throws [BlurHashEncodeException] when [numCompX] and [numCompY] do not lie within the
 /// expected range. Also throws [BlurHashEncodeException] when the [data] array is not in
-/// the expeted RGBA32 format.
+/// the expected RGBA32 format.
 String encodeBlurHash(
   Uint8List data,
   int width,
