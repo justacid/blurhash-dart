@@ -5,6 +5,10 @@ running tests) for maximum flexibility. Supports encoding and decoding. See
 [BlurHash](https://blurha.sh/) website or [GitHub
 Repository](https://github.com/woltapp/blurhash) for more information.
 
+The encoder of this dart implementation produces slightly different hashes than the
+TypeScript implementation but matches the official C and Python implementation. In
+practice this should not be relevant.
+
 ## Basic usage
 
 ### Decoding a BlurHash
