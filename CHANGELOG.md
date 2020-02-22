@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.3] 22.02.20
+
+* Make the pub.dev analysis tool happy
+* Formatting
+
 ## [0.2.2] 22.02.20
 
 * Fix minor style issues
