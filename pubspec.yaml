@@ -3,7 +3,7 @@ version: 0.2.3
 homepage: https://github.com/justacid/blurhash-dart
 description: >
   A pure dart implementation of the BlurHash algorithm.
-  This package provides both an encoder and an decoder.
+  This package provides both an encoder and a decoder.
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
