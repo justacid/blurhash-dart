@@ -67,7 +67,7 @@ Uint8List decodeBlurHash(
 /// BlurHash. Both parameters must lie between 1 and 9.
 ///
 /// Throws [BlurHashEncodeException] when [numCompX] and [numCompY] do not lie within the
-/// expected range. Also throws [BlurHashDecodeException] when the [data] array is not in
+/// expected range. Also throws [BlurHashEncodeException] when the [data] array is not in
 /// the expeted RGBA32 format.
 String encodeBlurHash(
   Uint8List data,
