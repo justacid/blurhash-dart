@@ -1,21 +1,20 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'bitmap.dart';
 import 'encoding.dart';
 import 'exception.dart';
 import 'foundation.dart';
 
-/// Decode a BlurHash to bitmap
+/// Decode a BlurHash to raw pixels in RGBA32 format
 ///
-/// Decodes a [blurHash] to a bitmap file with specified [width] and [height]. Both
-/// [width] and [height] must not be null and greater than 0. It is recommended to keep
-/// the [width] and [height] small and let the UI layer handle upscaling for better
-/// performance.
+/// Decodes a [blurHash] to raw pixels in RGBA32 format with specified [width] and
+/// [height]. Both [width] and [height] must not be null and greater than 0. It is
+/// recommended to keep the [width] and [height] small and let the UI layer handle
+/// upscaling for better performance.
 ///
-/// The [punch] parameters adjusts the contrast on the decoded image. Values less than 1
+/// The [punch] parameter adjusts the contrast on the decoded image. Values less than 1
 /// will make the effect more subtle, larger values will make the effect stronger. This
-/// is a design paramter to adjust the look.
+/// is a design parameter to adjust the look.
 ///
 /// Throws [BlurHashDecodeException] when an invalid BlurHash is encountered.
 Uint8List decodeBlurHash(
@@ -55,8 +54,7 @@ Uint8List decodeBlurHash(
     );
   }
 
-  final bytes = _transform(width, height, numCompX, numCompY, colors);
-  return buildBitmap(bytes, width, height);
+  return _transform(width, height, numCompX, numCompY, colors);
 }
 
 /// Encodes an image to a BlurHash string
