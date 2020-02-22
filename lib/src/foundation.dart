@@ -26,10 +26,24 @@ Color decodeAC(int value, double maxVal) {
   final b = value % 19.0;
 
   return Color(
-    signPow2((r - 9.0) / 9.0) * maxVal,
-    signPow2((g - 9.0) / 9.0) * maxVal,
-    signPow2((b - 9.0) / 9.0) * maxVal,
+    signPow((r - 9.0) / 9.0, 2.0) * maxVal,
+    signPow((g - 9.0) / 9.0, 2.0) * maxVal,
+    signPow((b - 9.0) / 9.0, 2.0) * maxVal,
   );
+}
+
+int encodeDC(Color color) {
+  final r = linearTosRGB(color.r);
+  final g = linearTosRGB(color.g);
+  final b = linearTosRGB(color.b);
+  return (r << 16) + (g << 8) + b;
+}
+
+int encodeAC(Color color, double maxVal) {
+  final r = max(0, min(18, signPow(color.r / maxVal, 0.5) * 9 + 9.5)).floor();
+  final g = max(0, min(18, signPow(color.g / maxVal, 0.5) * 9 + 9.5)).floor();
+  final b = max(0, min(18, signPow(color.b / maxVal, 0.5) * 9 + 9.5)).floor();
+  return r * 19 * 19 + g * 19 + b;
 }
 
 double sRGBtoLinear(int value) {
@@ -44,6 +58,6 @@ int linearTosRGB(double value) {
   return ((1.055 * pow(v, 1.0 / 2.4) - 0.055) * 255.0 + 0.5).toInt();
 }
 
-double signPow2(double value) {
-  return pow(value.abs(), 2.0) * value.sign;
+double signPow(double value, double exp) {
+  return pow(value.abs(), exp) * value.sign;
 }

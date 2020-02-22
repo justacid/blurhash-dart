@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:blurhash_dart/blurhash.dart';
+import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -14,6 +17,28 @@ void main() {
 
     expect(areEqual, true);
   });
+
+  final hashes = [
+    "LNAdApj[00aymkj[TKay9}ay-Sj[",
+    "LFE.@D9F01_2%L%MIVD*9Goe-;WB",
+    "LlMF%n00%#MwS|WCWEM{R*bbWBbH",
+    "LjIY5?00?bIUofWBWBM{WBofWBj[",
+  ];
+
+  for (var i = 0; i < hashes.length; ++i) {
+    test("encode blurhash - test picture $i", () {
+      final fileData = File("test/images/test$i.png").readAsBytesSync();
+      final image = decodeImage(fileData.toList());
+      final blurHash = encodeBlurHash(
+        image.getBytes(format: Format.rgba),
+        image.width,
+        image.height,
+        numCompX: 4,
+        numpCompY: 3,
+      );
+      expect(blurHash, hashes[i]);
+    });
+  }
 }
 
 const _decoded = [66, 77, 106, 11, 0, 0, 0, 0, 0, 0, 122, 0, 0, 0, 108, 0, 0, 0, 35,
