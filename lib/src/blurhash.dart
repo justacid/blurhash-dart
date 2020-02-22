@@ -109,7 +109,7 @@ String encodeBlurHash(
   blurHash.write(encode83(sizeFlag, 1));
 
   var maxVal = 1.0;
-  if (ac.length > 0) {
+  if (ac.isNotEmpty) {
     final maxElem = (Color c) => max(c.r.abs(), max(c.g.abs(), c.b.abs()));
     final actualMax = ac.map(maxElem).reduce(max);
     final quantisedMax = max(0, min(82, (actualMax * 166.0 - 0.5).floor()));
@@ -120,8 +120,9 @@ String encodeBlurHash(
   }
 
   blurHash.write(encode83(encodeDC(dc), 4));
-  for (final factor in ac)
+  for (final factor in ac) {
     blurHash.write(encode83(encodeAC(factor, maxVal), 2));
+  }
   return blurHash.toString();
 }
 

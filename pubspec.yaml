@@ -1,7 +1,14 @@
 name: blurhash_dart
-description: A pure dart implementation of blurhash
-version: 0.2.1
+version: 0.2.2
 homepage: https://github.com/justacid/blurhash-dart
+description: >
+  A pure dart implementation of the BlurHash algorithm. This package provides both an
+  encoder and an encoder for blurhashes. The encode/decoder routines work on raw
+  pixels in RGBA32 format - without any additional external dependencies. This
+  package explicitly does not depend on flutter, hence providing more flexibility
+  (e.g, usable with dart servers). This package also does not provide any routines to
+  convert pixel arrays from and to images. Dependents are responsible for conversion
+  themselves.
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
