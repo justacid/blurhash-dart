@@ -1,7 +1,6 @@
 name: blurhash_dart
 description: A pure dart implementation of blurhash
-version: 0.1.0
-author: Tobias Schwackenhofer
+version: 0.2.1
 homepage: https://github.com/justacid/blurhash-dart
 
 environment:

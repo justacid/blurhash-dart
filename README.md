@@ -19,7 +19,7 @@ the data to an image yourself. For this example we use the
 bitmap, then to an ui.Image.
 
 ```dart
-import 'package:blurhash_dart/blurhash.dart';
+import 'package:blurhash_dart/blurhash_dart.dart';
 import 'package:bitmap/bitmap.dart';
 
 import 'dart:ui' as ui; // for displaying the image
@@ -40,7 +40,7 @@ package installed, which decodes image files. The blurhash-dart API expects raw 
 in RGBA32 format for maximum flexibility.
 
 ```dart
-import 'package:blurhash_dart/blurhash.dart';
+import 'package:blurhash_dart/blurhash_dart.dart';
 import 'package:image/image.dart' as img; // for demo purposes
 //..
 

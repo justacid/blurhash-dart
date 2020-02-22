@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:blurhash_dart/blurhash.dart';
+import 'package:blurhash_dart/blurhash_dart.dart';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 

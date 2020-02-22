@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:blurhash_dart/blurhash.dart';
+import 'package:blurhash_dart/blurhash_dart.dart';
 
 void main() {
   String blurHash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj";
