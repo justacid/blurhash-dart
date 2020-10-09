@@ -98,7 +98,32 @@ void main() {
     expect(blurHash.isBottomLeftCornerDark(), true);
     expect(blurHash.isBottomRightCornerDark(), false);
   });
+
+  final BLACK = 0;
+  final horizontalBlurHash = blendHorizontal(BLACK, BLACK);
+  final verticalBlurHash = blendVertical(BLACK, BLACK);
+  final cornerBlurHash = blendCorner(BLACK, BLACK, BLACK, BLACK);
+
+  test("generated blended pictures are different", () {
+    expect(horizontalBlurHash.toString() == verticalBlurHash.toString(), false);
+    expect(verticalBlurHash.toString() == cornerBlurHash.toString(), false);
+    expect(cornerBlurHash.toString() == cornerBlurHash.toString(), false);
+
+    expect(horizontalBlurHash.toBitmap() == verticalBlurHash.toBitmap(), false);
+    expect(verticalBlurHash.toBitmap() == cornerBlurHash.toBitmap(), false);
+    expect(cornerBlurHash.toBitmap() == cornerBlurHash.toBitmap(), false);
+  });
+
+  final blendHashes = [];
+
+  test("generated blended pictures are correct", () {
+    expect(horizontalBlurHash.toString() == blendHashes[0], true);
+    expect(verticalBlurHash.toString() == blendHashes[1], true);
+    expect(cornerBlurHash.toString() == blendHashes[2], true);
+  });
 }
+
+
 
 const _decoded = [
   145, 173, 177, 255, 146, 173, 177, 255, 147, 173, 177, 255, 148, 174, 177, 255,
