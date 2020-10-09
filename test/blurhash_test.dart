@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 void main() {
   test("decode a blur hash and check equality", () {
     final blurHash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj";
-    final bitmap = decodeBlurHash(blurHash, 35, 20);
+    final bitmap = decodeBlurHash(blurHash, 35, 20).toBitmap();
 
     var areEqual = true;
     for (var i = 0; i < bitmap.length; ++i) {
@@ -34,10 +34,70 @@ void main() {
         image.height,
         numCompX: 4,
         numpCompY: 3,
-      );
+      ).toString();
       expect(blurHash, hashes[i]);
     });
   }
+
+  test("check if dark picture is dark", () {
+    final fileData = File("test/images/darkness_test_01.png").readAsBytesSync();
+    final image = decodeImage(fileData.toList());
+    final blurHash = encodeBlurHash(
+      image.getBytes(format: Format.rgba),
+      image.width,
+      image.height,
+      numCompX: 4,
+      numpCompY: 3,
+    );
+    expect(blurHash.isLeftEdgeDark(), true);
+    expect(blurHash.isRightEdgeDark(), true);
+    expect(blurHash.isBottomEdgeDark(), true);
+    expect(blurHash.isTopEdgeDark(), true);
+    expect(blurHash.isTopLeftCornerDark(), true);
+    expect(blurHash.isTopRightCornerDark(), true);
+    expect(blurHash.isBottomLeftCornerDark(), true);
+    expect(blurHash.isBottomRightCornerDark(), true);
+  });
+
+  test("check if light picture is not dark", () {
+    final fileData = File("test/images/darkness_test_02.png").readAsBytesSync();
+    final image = decodeImage(fileData.toList());
+    final blurHash = encodeBlurHash(
+      image.getBytes(format: Format.rgba),
+      image.width,
+      image.height,
+      numCompX: 4,
+      numpCompY: 3,
+    );
+    expect(blurHash.isLeftEdgeDark(), false);
+    expect(blurHash.isRightEdgeDark(), false);
+    expect(blurHash.isBottomEdgeDark(), false);
+    expect(blurHash.isTopEdgeDark(), false);
+    expect(blurHash.isTopLeftCornerDark(), false);
+    expect(blurHash.isTopRightCornerDark(), false);
+    expect(blurHash.isBottomLeftCornerDark(), false);
+    expect(blurHash.isBottomRightCornerDark(), false);
+  });
+
+  test("check if mixed picture is sometimes dark", () {
+    final fileData = File("test/images/darkness_test_01.png").readAsBytesSync();
+    final image = decodeImage(fileData.toList());
+    final blurHash = encodeBlurHash(
+      image.getBytes(format: Format.rgba),
+      image.width,
+      image.height,
+      numCompX: 4,
+      numpCompY: 3,
+    );
+    expect(blurHash.isLeftEdgeDark(), true);
+    expect(blurHash.isRightEdgeDark(), false);
+    expect(blurHash.isBottomEdgeDark(), true);
+    expect(blurHash.isTopEdgeDark(), true);
+    expect(blurHash.isTopLeftCornerDark(), true);
+    expect(blurHash.isTopRightCornerDark(), false);
+    expect(blurHash.isBottomLeftCornerDark(), true);
+    expect(blurHash.isBottomRightCornerDark(), false);
+  });
 }
 
 const _decoded = [
