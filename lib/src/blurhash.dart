@@ -5,6 +5,21 @@ import 'encoding.dart';
 import 'exception.dart';
 import 'foundation.dart';
 
+class BlurHash {
+  String blurHashString;
+  Uint8List blurHashList;
+
+  BlurHash(this.blurHashString,this.blurHashList);
+
+  Uint8List toBitmap(){
+    return blurHashList;
+  }
+
+  String toHash(){
+    return blurHashString;
+  }
+}
+
 /// Decode a BlurHash to raw pixels in RGBA32 format
 ///
 /// Decodes a [blurHash] to raw pixels in RGBA32 format with specified [width] and
@@ -17,7 +32,7 @@ import 'foundation.dart';
 /// is a design parameter to adjust the look.
 ///
 /// Throws [BlurHashDecodeException] when an invalid BlurHash is encountered.
-Uint8List decodeBlurHash(
+BlurHash decodeBlurHash(
   String blurHash,
   int width,
   int height, {
@@ -57,7 +72,7 @@ Uint8List decodeBlurHash(
   Uint8List image = _transform(width, height, numCompX, numCompY, colors);
   _RGBA32BitmapHeader header = _RGBA32BitmapHeader(image.length, width, height);
 
-  return header.appendContent(image);
+  return BlurHash(blurHash,header.appendContent(image));
 }
 
 
@@ -111,7 +126,7 @@ class _RGBA32BitmapHeader {
 /// Throws [BlurHashEncodeException] when [numCompX] and [numCompY] do not lie within the
 /// expected range. Also throws [BlurHashEncodeException] when the [data] array is not in
 /// the expected RGBA32 format.
-String encodeBlurHash(
+BlurHash encodeBlurHash(
   Uint8List data,
   int width,
   int height, {
@@ -167,7 +182,10 @@ String encodeBlurHash(
   for (final factor in ac) {
     blurHash.write(encode83(encodeAC(factor, maxVal), 2));
   }
-  return blurHash.toString();
+
+  String blurHashString = blurHash.toString();
+  
+  return decodeBlurHash(blurHashString, width, height);
 }
 
 Uint8List _transform(
