@@ -8,8 +8,27 @@ import 'foundation.dart';
 class BlurHash {
   String blurHashString;
   Uint8List blurHashList;
+  bool isLeftEdgeDark;
+  bool isRightEdgeDark;
+  bool isTopEdgeDark;
+  bool isBottomEdgeDark;
+  bool isTopLeftCornerDark;
+  bool isTopRightCornerDark;
+  bool isBottomLeftCornerDark;
+  bool isBottomRightCornerDark;
 
-  BlurHash(this.blurHashString,this.blurHashList);
+  BlurHash(blurHashString, blurHashList){
+    this.blurHashString = blurHashString;
+    this.blurHashList = blurHashList;
+    this.isLeftEdgeDark = isDarkAtX(0);
+    this.isRightEdgeDark = isDarkAtX(1);
+    this.isTopEdgeDark = isDarkAtY(0);
+    this.isBottomEdgeDark = isDarkAtY(1);
+    this.isTopLeftCornerDark = isDarkAtPos(0,0);
+    this.isTopRightCornerDark = isDarkAtPos(1,0);
+    this.isBottomLeftCornerDark = isDarkAtPos(0,1);
+    this.isBottomRightCornerDark = isDarkAtPos(1,1);
+  }
 
   Uint8List toBitmap(){
     return blurHashList;
@@ -74,47 +93,6 @@ BlurHash decodeBlurHash(
 
   return BlurHash(blurHash,header.appendContent(image));
 }
-
-
-const int _RGBA32HeaderSize = 122;
-
-class _RGBA32BitmapHeader {
-  final int contentSize;
-  Uint8List headerIntList;
-
-  /// Create a new RGBA32 header
-  _RGBA32BitmapHeader(this.contentSize, int width, int height) {
-    final int fileLength = contentSize + _RGBA32HeaderSize;
-    headerIntList = Uint8List(fileLength);
-    headerIntList.buffer.asByteData()
-      ..setUint8(0x0, 0x42)
-      ..setUint8(0x1, 0x4d)
-      ..setInt32(0x2, fileLength, Endian.little)
-      ..setInt32(0xa, _RGBA32HeaderSize, Endian.little)
-      ..setUint32(0xe, 108, Endian.little)
-      ..setUint32(0x12, width, Endian.little)
-      ..setUint32(0x16, -height, Endian.little)
-      ..setUint16(0x1a, 1, Endian.little)
-      ..setUint32(0x1c, 32, Endian.little)
-      ..setUint32(0x1e, 3, Endian.little)
-      ..setUint32(0x22, contentSize, Endian.little)
-      ..setUint32(0x36, 0x000000ff, Endian.little)
-      ..setUint32(0x3a, 0x0000ff00, Endian.little)
-      ..setUint32(0x3e, 0x00ff0000, Endian.little)
-      ..setUint32(0x42, 0xff000000, Endian.little);
-  }
-
-  Uint8List appendContent(Uint8List contentIntList) {
-    headerIntList.setRange(
-      _RGBA32HeaderSize,
-      contentSize + _RGBA32HeaderSize,
-      contentIntList,
-    );
-
-    return headerIntList;
-  }
-}
-
 
 /// Encodes an image to a BlurHash string
 ///
@@ -248,3 +226,43 @@ Color _multiplyBasisFunction(
   final scale = 1.0 / (width * height);
   return Color(r * scale, g * scale, b * scale);
 }
+
+const int _RGBA32HeaderSize = 122;
+
+class _RGBA32BitmapHeader {
+  final int contentSize;
+  Uint8List headerIntList;
+
+  /// Create a new RGBA32 header
+  _RGBA32BitmapHeader(this.contentSize, int width, int height) {
+    final int fileLength = contentSize + _RGBA32HeaderSize;
+    headerIntList = Uint8List(fileLength);
+    headerIntList.buffer.asByteData()
+      ..setUint8(0x0, 0x42)
+      ..setUint8(0x1, 0x4d)
+      ..setInt32(0x2, fileLength, Endian.little)
+      ..setInt32(0xa, _RGBA32HeaderSize, Endian.little)
+      ..setUint32(0xe, 108, Endian.little)
+      ..setUint32(0x12, width, Endian.little)
+      ..setUint32(0x16, -height, Endian.little)
+      ..setUint16(0x1a, 1, Endian.little)
+      ..setUint32(0x1c, 32, Endian.little)
+      ..setUint32(0x1e, 3, Endian.little)
+      ..setUint32(0x22, contentSize, Endian.little)
+      ..setUint32(0x36, 0x000000ff, Endian.little)
+      ..setUint32(0x3a, 0x0000ff00, Endian.little)
+      ..setUint32(0x3e, 0x00ff0000, Endian.little)
+      ..setUint32(0x42, 0xff000000, Endian.little);
+  }
+
+  Uint8List appendContent(Uint8List contentIntList) {
+    headerIntList.setRange(
+      _RGBA32HeaderSize,
+      contentSize + _RGBA32HeaderSize,
+      contentIntList,
+    );
+
+    return headerIntList;
+  }
+}
+
