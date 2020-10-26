@@ -8,6 +8,7 @@ import 'foundation.dart';
 class BlurHash {
   String blurHashString;
   Uint8List blurHashList;
+
   bool isLeftEdgeDark;
   bool isRightEdgeDark;
   bool isTopEdgeDark;
@@ -20,14 +21,59 @@ class BlurHash {
   BlurHash(blurHashString, blurHashList){
     this.blurHashString = blurHashString;
     this.blurHashList = blurHashList;
-    this.isLeftEdgeDark = isDarkAtX(0);
-    this.isRightEdgeDark = isDarkAtX(1);
-    this.isTopEdgeDark = isDarkAtY(0);
-    this.isBottomEdgeDark = isDarkAtY(1);
-    this.isTopLeftCornerDark = isDarkAtPos(0,0);
-    this.isTopRightCornerDark = isDarkAtPos(1,0);
-    this.isBottomLeftCornerDark = isDarkAtPos(0,1);
-    this.isBottomRightCornerDark = isDarkAtPos(1,1);
+
+    final threshold = 0.3;
+    this.isLeftEdgeDark = isDarkAtX(0, threshold);
+    this.isRightEdgeDark = isDarkAtX(1, threshold);
+    this.isTopEdgeDark = isDarkAtY(0, threshold);
+    this.isBottomEdgeDark = isDarkAtY(1, threshold);
+    this.isTopLeftCornerDark = isDarkAtPos(0,0, threshold);
+    this.isTopRightCornerDark = isDarkAtPos(1,0, threshold);
+    this.isBottomLeftCornerDark = isDarkAtPos(0,1, threshold);
+    this.isBottomRightCornerDark = isDarkAtPos(1,1, threshold);
+  }
+
+  bool isDarkAtX(x, threshold){
+    Color color = linearRGBAtX(x);
+    return color.r * 0.299 + color.g * 0.587 + color.b * 0.114 < threshold;
+  }
+
+  bool isDarkAtY(x, threshold){
+    Color color = linearRGBAtY(x);
+    return color.r * 0.299 + color.g * 0.587 + color.b * 0.114 < threshold;
+  }
+  
+  bool isDarkAtPos(x, y, threshold){
+    Color color = linearRGBAtPos(x,y);
+    return color.r * 0.299 + color.g * 0.587 + color.b * 0.114 < threshold;
+  }
+
+  Color linearRGBAtX(x){
+    if(x > numCompX){
+      throw ArgumentError(ArgumentError);
+    }
+    var sum;
+    for(int i = 0 + x; i <= numCompX * (numCompY -1) + x; i = i + numCompX){
+      sum = sum + colors[i] * cos(pi * i * x);
+    }
+    return sum;
+  }
+
+  Color linearRGBAtY(y){
+    if(y > numCompY){
+      throw ArgumentError(ArgumentError);
+    }
+    var sum;
+    for(int i = 0 + y * numCompX; i <= numCompX + y * numCompX; i++){
+      sum = sum + colors[i] * cos(pi * i * y);
+    }
+    return sum;
+  }
+
+  Color linearRGBAtPos(x,y){
+    final i = y * numCompX;
+    final j = i + x;
+    return colors[j] * cos(pi * i * y) * cos(pi * j * x);
   }
 
   Uint8List toBitmap(){
