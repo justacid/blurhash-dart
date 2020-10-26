@@ -6,6 +6,10 @@ import 'exception.dart';
 import 'foundation.dart';
 
 class BlurHash {
+  List<Color> colors;
+
+  int numCompX;
+  int numCompY;
   String blurHashString;
   Uint8List blurHashList;
 
@@ -18,9 +22,14 @@ class BlurHash {
   bool isBottomLeftCornerDark;
   bool isBottomRightCornerDark;
 
-  BlurHash(blurHashString, blurHashList){
+  BlurHash(blurHashString, blurHashList, colors, numCompX, numCompY){
     this.blurHashString = blurHashString;
     this.blurHashList = blurHashList;
+
+    this.colors = colors;
+
+    this.numCompX = numCompX;
+    this.numCompY = numCompY;
 
     final threshold = 0.3;
     this.isLeftEdgeDark = isDarkAtX(0, threshold);
@@ -137,7 +146,7 @@ BlurHash decodeBlurHash(
   Uint8List image = _transform(width, height, numCompX, numCompY, colors);
   _RGBA32BitmapHeader header = _RGBA32BitmapHeader(image.length, width, height);
 
-  return BlurHash(blurHash,header.appendContent(image));
+  return BlurHash(blurHash, header.appendContent(image), colors, numCompX, numCompY);
 }
 
 /// Encodes an image to a BlurHash string
