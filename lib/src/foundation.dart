@@ -6,6 +6,14 @@ class Color {
   final double r;
   final double g;
   final double b;
+
+  Color operator * (scalar){
+    Color newColor;
+    double r = this.r * scalar;
+    double g = this.g * scalar;
+    double b = this.b * scalar;
+    return Color(r,g,b);
+  }
 }
 
 Color decodeDC(int value) {
