@@ -5,6 +5,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
+  /*
   test("decode a blur hash and check equality", () {
     final blurHash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj";
     final bitmap = BlurHash.fromString(blurHash).toBitmap(35,20);
@@ -16,7 +17,7 @@ void main() {
 
     expect(areEqual, true);
   });
-
+  */
   final hashes = [
     "LNAdApj[00aymkj[TKay9}ay-Sj[",
     "LFE.@D9F01_2%L%MIVD*9Goe-;WB",
@@ -38,11 +39,11 @@ void main() {
       expect(blurHash, hashes[i]);
     });
   }
-/*
+
   test("check if dark picture is dark", () {
-    final fileData = File("test/images/darkness_test_01.png").readAsBytesSync();
+    final fileData = File("test/images/darkness_test_0.png").readAsBytesSync();
     final image = decodeImage(fileData.toList());
-    final blurHash = encodeBlurHash(
+    final blurHash = BlurHash.fromImage(
       image.getBytes(format: Format.rgba),
       image.width,
       image.height,
@@ -60,9 +61,9 @@ void main() {
   });
 
   test("check if light picture is not dark", () {
-    final fileData = File("test/images/darkness_test_02.png").readAsBytesSync();
+    final fileData = File("test/images/darkness_test_1.png").readAsBytesSync();
     final image = decodeImage(fileData.toList());
-    final blurHash = encodeBlurHash(
+    final blurHash = BlurHash.fromImage(
       image.getBytes(format: Format.rgba),
       image.width,
       image.height,
@@ -80,9 +81,9 @@ void main() {
   });
 
   test("check if mixed picture is sometimes dark", () {
-    final fileData = File("test/images/darkness_test_01.png").readAsBytesSync();
+    final fileData = File("test/images/darkness_test_2.png").readAsBytesSync();
     final image = decodeImage(fileData.toList());
-    final blurHash = encodeBlurHash(
+    final blurHash = BlurHash.fromImage(
       image.getBytes(format: Format.rgba),
       image.width,
       image.height,
@@ -91,14 +92,15 @@ void main() {
     );
     expect(blurHash.isLeftEdgeDark, true);
     expect(blurHash.isRightEdgeDark, false);
-    expect(blurHash.isBottomEdgeDark, true);
-    expect(blurHash.isTopEdgeDark, true);
+    expect(blurHash.isBottomEdgeDark, false);
+    expect(blurHash.isTopEdgeDark, false);
     expect(blurHash.isTopLeftCornerDark, true);
     expect(blurHash.isTopRightCornerDark, false);
     expect(blurHash.isBottomLeftCornerDark, true);
     expect(blurHash.isBottomRightCornerDark, false);
   });
 
+/*
   final BLACK = 0;
   final horizontalBlurHash = blendHorizontal(BLACK, BLACK);
   final verticalBlurHash = blendVertical(BLACK, BLACK);

@@ -79,9 +79,18 @@ class BlurHash {
         }
       }
     }
-    this.components = components;
 
+    this.components = components;
     this.punch(punch);
+    var threshold = 0.3;
+    this.isLeftEdgeDark = isDarkAtX(0, threshold);
+    this.isRightEdgeDark = isDarkAtX(1, threshold);
+    this.isTopEdgeDark = isDarkAtY(0, threshold);
+    this.isBottomEdgeDark = isDarkAtY(1, threshold);
+    this.isTopLeftCornerDark = isDarkAtPos(0, 0, threshold);
+    this.isTopRightCornerDark = isDarkAtPos(1, 0, threshold);
+    this.isBottomLeftCornerDark = isDarkAtPos(0, 1, threshold);
+    this.isBottomRightCornerDark = isDarkAtPos(1, 1, threshold);
   }
 
   /// Decodes a [blurHash] to raw pixels in RGBA32 format with specified [width] and
@@ -107,22 +116,7 @@ class BlurHash {
   /// expected range. Also throws [BlurHashEncodeException] when the [data] array is not in
   /// the expected RGBA32 format.
 
-  BlurHash.fromImage( 
-  Uint8List data,
-  int width,
-  int height, {
-  int numCompX = 4,
-  int numpCompY = 3,
-  }) {
-    String blurHashString = createHash(data, width, height);
-    BlurHash blurHash = BlurHash.fromString(blurHashString);
-    this.components = blurHash.components;
-    this.numCompX = blurHash.numCompX;
-    this.numCompY = blurHash.numCompY;
-    this.blurHashString = blurHashString;
-  }
-
-  String createHash(
+  BlurHash.fromImage(
   Uint8List data,
   int width,
   int height, {
@@ -178,7 +172,20 @@ class BlurHash {
       blurHash.write(encode83(encodeAC(factor, maxVal), 2));
     }
 
-    return blurHash.toString();
+    BlurHash createdBlurHash = BlurHash.fromString(blurHash.toString());
+    this.components = createdBlurHash.components;
+    this.blurHashString = blurHash.toString();
+    this.numCompX = createdBlurHash.numCompX;
+    this.numCompY = createdBlurHash.numCompY;
+
+    this.isLeftEdgeDark = createdBlurHash.isLeftEdgeDark;
+    this.isRightEdgeDark = createdBlurHash.isRightEdgeDark;
+    this.isTopEdgeDark = createdBlurHash.isTopEdgeDark;
+    this.isBottomEdgeDark = createdBlurHash.isBottomEdgeDark;
+    this.isTopLeftCornerDark = createdBlurHash.isTopLeftCornerDark;
+    this.isTopRightCornerDark = createdBlurHash.isTopRightCornerDark;
+    this.isBottomLeftCornerDark = createdBlurHash.isBottomLeftCornerDark;
+    this.isBottomRightCornerDark = createdBlurHash.isBottomRightCornerDark;
   }
 
   String toHash(){
@@ -186,7 +193,6 @@ class BlurHash {
   }
 
   ///Checks if certain spots of a picture are Dark
-  /*
   bool isDarkAtX(x, threshold){
     Color color = linearRGBAtX(x);
     return color.r * 0.299 + color.g * 0.587 + color.b * 0.114 < threshold;
@@ -206,18 +212,24 @@ class BlurHash {
     if(x >= numCompX){
       throw ArgumentError(ArgumentError);
     }
-    return components[0].reduce((value, element) => value + element *(pi * x));
+
+    Color sum = Color(0,0,0);
+    int i = 0;
+    for(final component in components[0]){
+      sum += component * cos(pi * i++ * x);
+    }
+    return sum;
   }
 
   Color linearRGBAtY(y){
     if(y >= numCompY){
       throw ArgumentError(ArgumentError);
     }
+
     Color sum = Color(0,0,0);
-    int count = 0;
-    final offset = y * numCompX;
-    for(int i = offset; i < offset + numCompX; i++){
-      sum = sum + (colors[i] * cos(pi * count++ * y));
+    int i = 0;
+    for(final horizontalComponents in components){
+      sum += horizontalComponents[0] * cos(pi * i++ * y);
     }
     return sum;
   }
@@ -226,11 +238,14 @@ class BlurHash {
     if(y >= numCompY || x >= numCompX){
       throw ArgumentError(ArgumentError);
     }
-    final i = y * numCompX;
-    final j = i + x;
-    return colors[j] * cos(pi * i * y) * cos(pi * j * x);
+    Color sum = Color(0,0,0);
+    for(var j = 0; j < numCompY; j++){
+      for(var i = 0; i <numCompX; i++){
+        sum += components[j][i] * cos(pi * i * x) * cos(pi * j * y);
+      }
+    }
+    return sum;
   }
-  */
 }
 
 Uint8List _transform(
