@@ -8,10 +8,16 @@ class Color {
   final double b;
 
   Color operator * (scalar){
-    Color newColor;
     double r = this.r * scalar;
     double g = this.g * scalar;
     double b = this.b * scalar;
+    return Color(r,g,b);
+  }
+
+  Color operator + (other){
+    double r = this.r + other.r;
+    double g = this.g + other.g;
+    double b = this.b + other.b;
     return Color(r,g,b);
   }
 }
