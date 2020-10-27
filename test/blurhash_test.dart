@@ -5,10 +5,9 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  /*
   test("decode a blur hash and check equality", () {
     final blurHash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj";
-    final bitmap = BlurHash.fromString(blurHash).toBitmap(35,20);
+    final bitmap = fromString(blurHash).toBitmap(35,20);
 
     var areEqual = true;
     for (var i = 0; i < bitmap.length; ++i) {
@@ -17,7 +16,7 @@ void main() {
 
     expect(areEqual, true);
   });
-  */
+
   final hashes = [
     "LNAdApj[00aymkj[TKay9}ay-Sj[",
     "LFE.@D9F01_2%L%MIVD*9Goe-;WB",
@@ -29,12 +28,12 @@ void main() {
     test("encode blurhash - test picture $i", () {
       final fileData = File("test/images/test$i.png").readAsBytesSync();
       final image = decodeImage(fileData.toList());
-      final blurHash = BlurHash.fromImage(
+      final blurHash = fromImage(
         image.getBytes(format: Format.rgba),
         image.width,
         image.height,
         numCompX: 4,
-        numpCompY: 3,
+        numCompY: 3,
       ).toHash();
       expect(blurHash, hashes[i]);
     });
@@ -43,12 +42,12 @@ void main() {
   test("check if dark picture is dark", () {
     final fileData = File("test/images/darkness_test_0.png").readAsBytesSync();
     final image = decodeImage(fileData.toList());
-    final blurHash = BlurHash.fromImage(
+    final blurHash = fromImage(
       image.getBytes(format: Format.rgba),
       image.width,
       image.height,
       numCompX: 4,
-      numpCompY: 3,
+      numCompY: 3,
     );
     expect(blurHash.isDark, true);
     expect(blurHash.isLeftEdgeDark, true);
@@ -64,12 +63,12 @@ void main() {
   test("check if light picture is not dark", () {
     final fileData = File("test/images/darkness_test_1.png").readAsBytesSync();
     final image = decodeImage(fileData.toList());
-    final blurHash = BlurHash.fromImage(
+    final blurHash = fromImage(
       image.getBytes(format: Format.rgba),
       image.width,
       image.height,
       numCompX: 4,
-      numpCompY: 3,
+      numCompY: 3,
     );
     expect(blurHash.isDark, false);
     expect(blurHash.isLeftEdgeDark, false);
@@ -85,12 +84,12 @@ void main() {
   test("check if mixed picture is sometimes dark", () {
     final fileData = File("test/images/darkness_test_2.png").readAsBytesSync();
     final image = decodeImage(fileData.toList());
-    final blurHash = BlurHash.fromImage(
+    final blurHash = fromImage(
       image.getBytes(format: Format.rgba),
       image.width,
       image.height,
       numCompX: 4,
-      numpCompY: 3,
+      numCompY: 3,
     );
     expect(blurHash.isDark, false);
     expect(blurHash.isLeftEdgeDark, true);

@@ -23,66 +23,11 @@ class BlurHash {
   bool isBottomLeftCornerDark;
   bool isBottomRightCornerDark;
 
-  BlurHash(this.components);
-
-  void punch(factor){
-    for(int i = 0; i < this.components.length; i++){
-      for(int j = 0; j < this.components[i].length; j++){
-        if(i!=0 && j!=0){
-          this.components[i][j] = this.components[i][j] * factor;
-        }
-      }
-    }
-  }
-
-  /// Decode a BlurHash String to a BlurHash object
-  ///
-  /// The [punch] parameter adjusts the contrast on the decoded image. Values less than 1
-  /// will make the effect more subtle, larger values will make the effect stronger. This
-  /// is a design parameter to adjust the look.
-  ///
-  /// Throws [BlurHashDecodeException] when an invalid BlurHash is encountered.
-  BlurHash.fromString(
-    String blurHash, {
-    double punch = 1.0
-  }){
-    if (blurHash == null || blurHash.length < 6) {
-      throw BlurHashDecodeException(
-        message: "BlurHash must not be null or '< 6' characters long.",
-      );
-    }
-    final sizeFlag = decode83(blurHash, 0, 1);
-    this.numCompX = (sizeFlag % 9) + 1;
-    this.numCompY = (sizeFlag ~/ 9) + 1;
-    this.blurHashString = blurHash;
-
-    if (blurHash.length != 4 + 2 * numCompX * numCompY) {
-      throw BlurHashDecodeException(
-        message: "Invalid number of components in BlurHash.",
-      );
-    }
-
-    final maxAcEnc = decode83(blurHash, 1, 2);
-    final maxAc = (maxAcEnc + 1) / 166.0;
-    var components = List.generate(this.numCompY, (i) => List<Color>(numCompX));
-    for(int j = 0; j < this.numCompY; j++){
-      for(int i = 0; i < this.numCompX; i++){
-        if(i == 0 && j == 0){
-          final value = decodeDC(decode83(blurHash, 2, 6));
-          components[j][i] = value;
-        } else{
-          final index = i+j*numCompX; 
-          final value = decodeAC(
-          decode83(blurHash, 4 + index * 2, (4 + index * 2) + 2),
-          maxAc,
-          );
-          components[j][i] = value;
-        }
-      }
-    }
-
+  BlurHash(components){
     this.components = components;
-    this.punch(punch);
+    this.numCompX = components[0].length;
+    this.numCompY = components.length;
+
     var threshold = 0.3;
     this.isDark = isAverageDark(threshold);
     this.isLeftEdgeDark = isDarkAtX(0, threshold);
@@ -104,95 +49,12 @@ class BlurHash {
     assert(height != null && height > 0);
     Uint8List image = _transform(width, height, numCompX, numCompY, components);
     _RGBA32BitmapHeader header = _RGBA32BitmapHeader(image.length, width, height);
+    //return image;
     return header.appendContent(image);
   }
 
-  /// Encodes an image to a BlurHash string
-  ///
-  /// The format of the given [data] array is expected to be raw pixels in RGBA32 format -
-  /// without any additional image headers. The [width] and [height] are the dimensions of
-  /// the given image. Parameters [numCompX] and [numCompY] are the components of the
-  /// BlurHash. Both parameters must lie between 1 and 9.
-  ///
-  /// Throws [BlurHashEncodeException] when [numCompX] and [numCompY] do not lie within the
-  /// expected range. Also throws [BlurHashEncodeException] when the [data] array is not in
-  /// the expected RGBA32 format.
-
-  BlurHash.fromImage(
-  Uint8List data,
-  int width,
-  int height, {
-  int numCompX = 4,
-  int numpCompY = 3,
-  }) {
-    if (numCompX < 1 || numCompX > 9 || numpCompY < 1 || numCompX > 9) {
-      throw BlurHashEncodeException(
-        message: "BlurHash components must lie between 1 and 9.",
-      );
-    }
-
-    if (width * height * 4 != data.length) {
-      throw BlurHashEncodeException(
-        message: "The width and height must match the data array."
-            "The expected format is RGBA32",
-      );
-    }
-    final factors = List<Color>(numCompX * numpCompY);
-    int i = 0;
-    for (var y = 0; y < numpCompY; ++y) {
-      for (var x = 0; x < numCompX; ++x) {
-        final normalisation = (x == 0 && y == 0) ? 1.0 : 2.0;
-        final basisFunc = (int i, int j) {
-          return normalisation *
-              cos((pi * x * i) / width) *
-              cos((pi * y * j) / height);
-        };
-        factors[i++] = _multiplyBasisFunction(data, width, height, basisFunc);
-      }
-    }
-
-    final dc = factors.first;
-    final ac = factors.skip(1).toList();
-
-    final blurHash = StringBuffer();
-    final sizeFlag = (numCompX - 1) + (numpCompY - 1) * 9;
-    blurHash.write(encode83(sizeFlag, 1));
-
-    var maxVal = 1.0;
-    if (ac.isNotEmpty) {
-      final maxElem = (Color c) => max(c.r.abs(), max(c.g.abs(), c.b.abs()));
-      final actualMax = ac.map(maxElem).reduce(max);
-      final quantisedMax = max(0, min(82, (actualMax * 166.0 - 0.5).floor()));
-      maxVal = (quantisedMax + 1.0) / 166.0;
-      blurHash.write(encode83(quantisedMax, 1));
-    } else {
-      blurHash.write(encode83(0, 1));
-    }
-
-    blurHash.write(encode83(encodeDC(dc), 4));
-    for (final factor in ac) {
-      blurHash.write(encode83(encodeAC(factor, maxVal), 2));
-    }
-
-    BlurHash createdBlurHash = BlurHash.fromString(blurHash.toString());
-    this.components = createdBlurHash.components;
-    this.blurHashString = blurHash.toString();
-    this.numCompX = createdBlurHash.numCompX;
-    this.numCompY = createdBlurHash.numCompY;
-
-    this.isDark = createdBlurHash.isDark;
-    this.isLeftEdgeDark = createdBlurHash.isLeftEdgeDark;
-    this.isRightEdgeDark = createdBlurHash.isRightEdgeDark;
-    this.isTopEdgeDark = createdBlurHash.isTopEdgeDark;
-    this.isBottomEdgeDark = createdBlurHash.isBottomEdgeDark;
-    this.isTopLeftCornerDark = createdBlurHash.isTopLeftCornerDark;
-    this.isTopRightCornerDark = createdBlurHash.isTopRightCornerDark;
-    this.isBottomLeftCornerDark = createdBlurHash.isBottomLeftCornerDark;
-    this.isBottomRightCornerDark = createdBlurHash.isBottomRightCornerDark;
-  }
-
   String toHash(){
-    return this.blurHashString;
+    return blurHashString;
   }
 
   ///Checks if certain spots of a picture are Dark
@@ -282,6 +144,156 @@ class BlurHash {
     }
     return sum;
   }
+}
+/// Decode a BlurHash String to a BlurHash object
+///
+/// The [punch] parameter adjusts the contrast on the decoded image. Values less than 1
+/// will make the effect more subtle, larger values will make the effect stronger. This
+/// is a design parameter to adjust the look.
+///
+/// Throws [BlurHashDecodeException] when an invalid BlurHash is encountered.
+BlurHash fromString(
+  String blurHash, {
+  double punch = 1.0
+}){
+  if (blurHash == null || blurHash.length < 6) {
+    throw BlurHashDecodeException(
+      message: "BlurHash must not be null or '< 6' characters long.",
+    );
+  }
+  final sizeFlag = decode83(blurHash, 0, 1);
+  final numCompX = (sizeFlag % 9) + 1;
+  final numCompY = (sizeFlag ~/ 9) + 1;
+
+  if (blurHash.length != 4 + 2 * numCompX * numCompY) {
+    throw BlurHashDecodeException(
+      message: "Invalid number of components in BlurHash.",
+    );
+  }
+
+  final maxAcEnc = decode83(blurHash, 1, 2);
+  final maxAc = (maxAcEnc + 1) / 166.0;
+  var components = List.generate(numCompY, (i) => List<Color>(numCompX));
+  for(int j = 0; j < numCompY; j++){
+    for(int i = 0; i < numCompX; i++){
+      if(i == 0 && j == 0){
+        final value = decodeDC(decode83(blurHash, 2, 6));
+        components[j][i] = value;
+      } else{
+        final index = i+j*numCompX; 
+        final value = decodeAC(
+        decode83(blurHash, 4 + index * 2, (4 + index * 2) + 2),
+        maxAc,
+        );
+        components[j][i] = value;
+      }
+    }
+  }
+  BlurHash createdBlurHash = BlurHash(calculatePunch(components,punch));
+  createdBlurHash.blurHashString = blurHash;
+  return createdBlurHash;
+}
+
+/// Encodes an image to a BlurHash string
+///
+/// The format of the given [data] array is expected to be raw pixels in RGBA32 format -
+/// without any additional image headers. The [width] and [height] are the dimensions of
+/// the given image. Parameters [numCompX] and [numCompY] are the components of the
+/// BlurHash. Both parameters must lie between 1 and 9.
+///
+/// Throws [BlurHashEncodeException] when [numCompX] and [numCompY] do not lie within the
+/// expected range. Also throws [BlurHashEncodeException] when the [data] array is not in
+/// the expected RGBA32 format.
+
+BlurHash fromImage(
+Uint8List data,
+int width,
+int height, {
+int numCompX = 4,
+int numCompY = 3,
+}) {
+  if (numCompX < 1 || numCompX > 9 || numCompY < 1 || numCompX > 9) {
+    throw BlurHashEncodeException(
+      message: "BlurHash components must lie between 1 and 9.",
+    );
+  }
+
+  if (width * height * 4 != data.length) {
+    throw BlurHashEncodeException(
+      message: "The width and height must match the data array."
+          "The expected format is RGBA32",
+    );
+  }
+
+  final factors = List<Color>(numCompX * numCompY);
+  int i = 0;
+  for (var y = 0; y < numCompY; ++y) {
+    for (var x = 0; x < numCompX; ++x) {
+      final normalisation = (x == 0 && y == 0) ? 1.0 : 2.0;
+      final basisFunc = (int i, int j) {
+        return normalisation *
+            cos((pi * x * i) / width) *
+            cos((pi * y * j) / height);
+      };
+      factors[i++] = _multiplyBasisFunction(data, width, height, basisFunc);
+    }
+  }
+  return fromString(createString(factors,numCompX,numCompY));
+}
+
+String createString(List<Color> factors, numCompX, numCompY){
+  final dc = factors.first;
+  final ac = factors.skip(1).toList();
+
+  final blurHash = StringBuffer();
+  final sizeFlag = (numCompX - 1) + (numCompY - 1) * 9;
+  blurHash.write(encode83(sizeFlag, 1));
+
+  var maxVal = 1.0;
+  if (ac.isNotEmpty) {
+    final maxElem = (Color c) => max(c.r.abs(), max(c.g.abs(), c.b.abs()));
+    final actualMax = ac.map(maxElem).reduce(max);
+    final quantisedMax = max(0, min(82, (actualMax * 166.0 - 0.5).floor()));
+    maxVal = (quantisedMax + 1.0) / 166.0;
+    blurHash.write(encode83(quantisedMax, 1));
+  } else {
+    blurHash.write(encode83(0, 1));
+  }
+
+  blurHash.write(encode83(encodeDC(dc), 4));
+  for (final factor in ac) {
+    blurHash.write(encode83(encodeAC(factor, maxVal), 2));
+  }
+  return blurHash.toString();
+}
+
+///Create a Blend from top and Bottom BlurHash
+BlurHash blendingTopBottom(topBlurHash, bottomBlurHash){
+  if (topBlurHash.components.count() != 1 && bottomBlurHash.components.count() != 1) {
+    throw BlurHashEncodeException(
+      message: "Blended BlurHashes must have only one vertical component",
+    );
+  }
+  final top = topBlurHash.components[0];
+  final bottom = bottomBlurHash.components[0];
+  List<Color> average;
+  List<Color> difference;
+  for(var i = 0; i < min(top.length,bottom.length);i++){
+    average.add((top[i] + bottom[i])/2);
+    difference.add((top[i] - bottom[i])/2);
+  }
+  return BlurHash([average,difference]);
+}
+
+List<List<Color>> calculatePunch(components,factor){
+  for(int i = 0; i < components.length; i++){
+    for(int j = 0; j < components[i].length; j++){
+      if(i!=0 && j!=0){
+        components[i][j] = components[i][j] * factor;
+      }
+    }
+  }
+  return components;
 }
 
 Uint8List _transform(
