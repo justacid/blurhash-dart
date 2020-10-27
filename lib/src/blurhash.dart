@@ -58,28 +58,34 @@ class BlurHash {
   }
 
   Color linearRGBAtX(x){
-    if(x > numCompX){
+    if(x >= numCompX){
       throw ArgumentError(ArgumentError);
     }
-    var sum;
+    Color sum = Color(0,0,0);
+    int count = 0;
     for(int i = 0 + x; i <= numCompX * (numCompY -1) + x; i = i + numCompX){
-      sum = sum + colors[i] * cos(pi * i * x);
+      sum = sum + (colors[i] * cos(pi * count++ * x));
     }
     return sum;
   }
 
   Color linearRGBAtY(y){
-    if(y > numCompY){
+    if(y >= numCompY){
       throw ArgumentError(ArgumentError);
     }
-    var sum;
-    for(int i = 0 + y * numCompX; i <= numCompX + y * numCompX; i++){
-      sum = sum + colors[i] * cos(pi * i * y);
+    Color sum = Color(0,0,0);
+    int count = 0;
+    final offset = y * numCompX;
+    for(int i = offset; i < offset + numCompX; i++){
+      sum = sum + (colors[i] * cos(pi * count++ * y));
     }
     return sum;
   }
 
   Color linearRGBAtPos(x,y){
+    if(y >= numCompY || x >= numCompX){
+      throw ArgumentError(ArgumentError);
+    }
     final i = y * numCompX;
     final j = i + x;
     return colors[j] * cos(pi * i * y) * cos(pi * j * x);
