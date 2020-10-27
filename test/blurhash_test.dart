@@ -50,6 +50,7 @@ void main() {
       numCompX: 4,
       numpCompY: 3,
     );
+    expect(blurHash.isDark, true);
     expect(blurHash.isLeftEdgeDark, true);
     expect(blurHash.isRightEdgeDark, true);
     expect(blurHash.isBottomEdgeDark, true);
@@ -70,6 +71,7 @@ void main() {
       numCompX: 4,
       numpCompY: 3,
     );
+    expect(blurHash.isDark, false);
     expect(blurHash.isLeftEdgeDark, false);
     expect(blurHash.isRightEdgeDark, false);
     expect(blurHash.isBottomEdgeDark, false);
@@ -90,6 +92,7 @@ void main() {
       numCompX: 4,
       numpCompY: 3,
     );
+    expect(blurHash.isDark, false);
     expect(blurHash.isLeftEdgeDark, true);
     expect(blurHash.isRightEdgeDark, false);
     expect(blurHash.isBottomEdgeDark, false);

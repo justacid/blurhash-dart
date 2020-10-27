@@ -13,6 +13,7 @@ class BlurHash {
 
   String blurHashString;
 
+  bool isDark;
   bool isLeftEdgeDark;
   bool isRightEdgeDark;
   bool isTopEdgeDark;
@@ -83,14 +84,15 @@ class BlurHash {
     this.components = components;
     this.punch(punch);
     var threshold = 0.3;
+    this.isDark = isAverageDark(threshold);
     this.isLeftEdgeDark = isDarkAtX(0, threshold);
-    this.isRightEdgeDark = isDarkAtX(1, threshold);
+    this.isRightEdgeDark = isDarkAtX(numCompX-1, threshold);
     this.isTopEdgeDark = isDarkAtY(0, threshold);
-    this.isBottomEdgeDark = isDarkAtY(1, threshold);
+    this.isBottomEdgeDark = isDarkAtY(numCompY-1, threshold);
     this.isTopLeftCornerDark = isDarkAtPos(0, 0, threshold);
-    this.isTopRightCornerDark = isDarkAtPos(1, 0, threshold);
-    this.isBottomLeftCornerDark = isDarkAtPos(0, 1, threshold);
-    this.isBottomRightCornerDark = isDarkAtPos(1, 1, threshold);
+    this.isTopRightCornerDark = isDarkAtPos(numCompX-1, 0, threshold);
+    this.isBottomLeftCornerDark = isDarkAtPos(0, numCompY-1, threshold);
+    this.isBottomRightCornerDark = isDarkAtPos(numCompX-1, numCompY-1, threshold);
   }
 
   /// Decodes a [blurHash] to raw pixels in RGBA32 format with specified [width] and
@@ -178,6 +180,7 @@ class BlurHash {
     this.numCompX = createdBlurHash.numCompX;
     this.numCompY = createdBlurHash.numCompY;
 
+    this.isDark = createdBlurHash.isDark;
     this.isLeftEdgeDark = createdBlurHash.isLeftEdgeDark;
     this.isRightEdgeDark = createdBlurHash.isRightEdgeDark;
     this.isTopEdgeDark = createdBlurHash.isTopEdgeDark;
@@ -193,19 +196,38 @@ class BlurHash {
   }
 
   ///Checks if certain spots of a picture are Dark
+  bool isAverageDark(threshold){
+    Color color = averageLinearRGB();
+    return checkDarkness(color, threshold);
+  }
+
   bool isDarkAtX(x, threshold){
     Color color = linearRGBAtX(x);
-    return color.r * 0.299 + color.g * 0.587 + color.b * 0.114 < threshold;
+    return checkDarkness(color, threshold);
   }
 
   bool isDarkAtY(x, threshold){
     Color color = linearRGBAtY(x);
-    return color.r * 0.299 + color.g * 0.587 + color.b * 0.114 < threshold;
+    return checkDarkness(color, threshold);
   }
   
   bool isDarkAtPos(x, y, threshold){
     Color color = linearRGBAtPos(x,y);
+    return checkDarkness(color, threshold);
+  }
+
+  bool isDarkFromUpperRightToLowerLeft(upperLeftX,upperLeftY,lowerRightX,lowerRightY,threshold){
+    Color color = linearRGBFromUpperLeftToLowerRight(upperLeftX, upperLeftY, lowerRightX, lowerRightY);
+    return checkDarkness(color,threshold);
+  }
+
+  bool checkDarkness(color, threshold){
     return color.r * 0.299 + color.g * 0.587 + color.b * 0.114 < threshold;
+  }
+
+/// Calculates LinearRGB Values at certain spots
+  Color averageLinearRGB(){
+    return components[0][0];
   }
 
   Color linearRGBAtX(x){
@@ -242,6 +264,20 @@ class BlurHash {
     for(var j = 0; j < numCompY; j++){
       for(var i = 0; i <numCompX; i++){
         sum += components[j][i] * cos(pi * i * x) * cos(pi * j * y);
+      }
+    }
+    return sum;
+  }
+  Color linearRGBFromUpperLeftToLowerRight(upperLeftX,upperLeftY,lowerRightX,lowerRightY){
+    if(upperLeftY >= numCompY || lowerRightY >= numCompY || upperLeftX >= numCompX || lowerRightX >= numCompX){
+      throw ArgumentError(ArgumentError);
+    }
+    Color sum = Color(0,0,0);
+    for(var j = 0; j < numCompY; j++){
+      for(var i = 0; i < numCompX; i++){
+        final horizontalAverage = i==0 ? 1 : ((sin(pi * i * lowerRightX) - sin(pi * i * upperLeftX))/(i*pi*(lowerRightX-upperLeftX)));
+        final verticalAverage = j==0 ? 1 : ((sin(pi * j * lowerRightY) - sin(pi * j * upperLeftY))/(j*pi*(lowerRightY-upperLeftY)));
+        sum += components[j][i] * horizontalAverage * verticalAverage;
       }
     }
     return sum;
