@@ -20,6 +20,10 @@ class Color {
     double b = this.b + other.b;
     return Color(r,g,b);
   }
+
+  Color operator / (scalar){
+    return this * 1/scalar;
+  }
 }
 
 Color decodeDC(int value) {
