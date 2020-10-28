@@ -145,6 +145,8 @@ class BlurHash {
     return sum;
   }
 }
+
+
 /// Decode a BlurHash String to a BlurHash object
 ///
 /// The [punch] parameter adjusts the contrast on the decoded image. Values less than 1
@@ -283,6 +285,85 @@ BlurHash blendingTopBottom(topBlurHash, bottomBlurHash){
     difference.add((top[i] - bottom[i])/2);
   }
   return BlurHash([average,difference]);
+}
+
+BlurHash blendingLeftRight(leftBlurHash,rightBlurHash){
+  return blendingTopBottom(transpose(leftBlurHash),transpose(rightBlurHash));
+}
+
+BlurHash generateColoredBlurHash(Color color){
+  return BlurHash(color);
+}
+
+BlurHash generateBlendTopBottom(Color topColor, Color bottomColor){
+  return blendingTopBottom(generateColoredBlurHash(topColor), generateColoredBlurHash(bottomColor));
+}
+
+BlurHash generateBlendLeftRight(Color leftColor, Color rightColor){
+  return blendingLeftRight(generateColoredBlurHash(leftColor), generateColoredBlurHash(rightColor));
+}
+
+BlurHash generateBlendCorners(Color topLeft, Color topRight, Color bottomLeft, Color bottomRight){
+  return blendingTopBottom(transpose(blendingTopBottom(topLeft,topRight)), transpose(blendingTopBottom(bottomLeft, bottomRight)));
+}
+
+BlurHash generateColorSteps(List<Color> horizontalColors, numberOfComponents){
+  if (numberOfComponents < 1 || numberOfComponents > 9) {    
+    throw BlurHashEncodeException(
+      message: "BlurHash components must lie between 1 and 9.",
+    );
+  }
+
+  List<Color> components = [];
+  for(var i = 0; i < numberOfComponents; i++){
+    final normalisation = i == 0 ? 1 : 2;
+    var sum = Color(0,0,0);
+    for(var x = 0; x < horizontalColors.length; x++){
+      final basis = normalisation * cos(pi * i * x / (horizontalColors.length - 1));
+      sum += horizontalColors[x] * basis;
+    }
+    components.add(sum/horizontalColors.length);
+  }
+  return BlurHash(components);
+}
+
+BlurHash mirrorHorizontally(blurHash){
+  var components = blurHash.components;
+  var numCompX = components[0].length;
+  var numCompY = components.length;
+  var mirroredComponents = List.generate(numCompY, (i) => List<Color>(numCompX));
+  for(var j = 0; j < numCompY; j++){
+    for(var i = 0; i < numCompX; i++){
+      mirroredComponents[j][i] = components[j][i] * (i%2 == 0 ? 1 : -1);
+    }
+  }
+  return BlurHash(mirroredComponents);
+}
+
+BlurHash mirrorVertically(blurHash){
+  var components = blurHash.components;
+  var numCompX = components[0].length;
+  var numCompY = components.length;
+  var mirroredComponents = List.generate(numCompY, (i) => List<Color>(numCompX));
+  for(var j = 0; j < numCompY; j++){
+    for(var i = 0; i < numCompX; i++){
+      mirroredComponents[j][i] = components[j][i] * (j%2 == 0 ? 1 : -1);
+    }
+  }
+  return BlurHash(mirroredComponents);
+}
+
+BlurHash transpose(blurHash){
+  var components = blurHash.components;
+  var numCompX = components[0].length;
+  var numCompY = components.length;
+  var transposedComponents = List.generate(numCompX, (i) => List<Color>(numCompY));
+  for(var j = 0; j < numCompY; j++){
+    for(var i = 0; i < numCompX; i++){
+      transposedComponents[i][j] = components[j][i];
+    }
+  }
+  return BlurHash(transposedComponents);
 }
 
 List<List<Color>> calculatePunch(components,factor){
