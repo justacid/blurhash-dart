@@ -21,8 +21,18 @@ class Color {
     return Color(r,g,b);
   }
 
+  Color operator - (other){
+    double r = this.r - other.r;
+    double g = this.g - other.g;
+    double b = this.b - other.b;
+    return Color(r,g,b);
+  }
+
   Color operator / (scalar){
-    return this * 1/scalar;
+    double r = this.r / scalar;
+    double g = this.g / scalar;
+    double b = this.g / scalar;
+    return Color(r,g,b);
   }
 }
 
