@@ -374,7 +374,7 @@ BlurHash generateBlendTopBottom(List topColor,List bottomColor){
 }
 
 BlurHash generateBlendLeftRight(List leftColor,List rightColor){
-  return blendingLeftRight(generateColoredBlurHash(leftColor), generateColoredBlurHash(rightColor));
+  return transpose(blendingLeftRight(generateColoredBlurHash(leftColor), generateColoredBlurHash(rightColor)));
 }
 
 BlurHash generateBlendCorners(List topLeft,List topRight,List bottomLeft,List bottomRight){
