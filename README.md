@@ -13,45 +13,26 @@ practice this should not be relevant.
 
 ### Decoding a BlurHash
 
-Decoding a BlurHash returns a raw array of pixels in RGBA32 format. You must convert
-the data to an image yourself. For this example we use the
-[bitmap](https://pub.dev/packages/bitmap) package to convert the pixel array to an
-bitmap, then to an ui.Image.
-
 ```dart
 import 'package:blurhash_dart/blurhash_dart.dart';
-import 'package:bitmap/bitmap.dart';
+import 'package:image/image.dart';
 
-import 'dart:ui' as ui; // for displaying the image
-//..
+String hash = 'LEHV6nWB2yk8pyo0adR*.7kCMdnj';
+BlurHash blurHash = BlurHash.decode(hash);
+Image image = blurHash.toImage(35, 20);
 
-String blurHash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj";
-Uint8List pixels = decodeBlurHash(blurHash, 35, 20);
-
-Bitmap bitmap = Bitmap.fromHeadless(35, 20, pixels);
-ui.Image image = await bitmap.buildImage();
-//..
+print(blurHash.hash);
 ```
 
 ### Encoding a BlurHash
 
-For demo purposes we assume to have the popular [image](https://pub.dev/packages/image)
-package installed, which decodes image files. The blurhash-dart API expects raw pixels
-in RGBA32 format for maximum flexibility.
-
 ```dart
 import 'package:blurhash_dart/blurhash_dart.dart';
-import 'package:image/image.dart' as img; // for demo purposes
-//..
+import 'package:image/image.dart';
 
 Uint8List fileData = File("some_image.png").readAsBytesSync();
-img.Image image = img.decodeImage(fileData.toList());
+Image image = decodeImage(fileData.toList());
+BlurHash blurHash = BlurHash.encode(image.getBytes(format: Format.rgba));
 
-final blurHash = encodeBlurHash(
-  image.getBytes(format: Format.rgba),
-  image.width,
-  image.height,
-);
-
-print("$blurHash");
+print(blurHash.hash);
 ```
