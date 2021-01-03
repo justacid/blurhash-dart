@@ -1,3 +1,5 @@
+
+// ignore_for_file: lines_longer_than_80_chars
 import 'dart:io';
 
 import 'package:blurhash_dart/blurhash_dart.dart';
@@ -5,37 +7,34 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("decode a blur hash and check equality", () {
-    final blurHash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj";
-    final bitmap = decodeBlurHash(blurHash, 35, 20);
+  test('decode a blurhash and check equality', () {
+    const blurHash = 'LEHV6nWB2yk8pyo0adR*.7kCMdnj';
+
+    final image = BlurHash.decode(blurHash).toImage(35, 20);
+    final data = image.getBytes(format: Format.rgba);
 
     var areEqual = true;
-    for (var i = 0; i < bitmap.length; ++i) {
-      if (bitmap[i] != _decoded[i]) areEqual = false;
+    for (var i = 0; i < data.length; ++i) {
+      if (data[i] != _decoded[i]) areEqual = false;
     }
 
     expect(areEqual, true);
   });
 
   final hashes = [
-    "LNAdApj[00aymkj[TKay9}ay-Sj[",
-    "LFE.@D9F01_2%L%MIVD*9Goe-;WB",
-    "LlMF%n00%#MwS|WCWEM{R*bbWBbH",
-    "LjIY5?00?bIUofWBWBM{WBofWBj[",
+    'LNAdApj[00aymkj[TKay9}ay-Sj[',
+    'LFE.@D9F01_2%L%MIVD*9Goe-;WB',
+    'LlMF%n00%#MwS|WCWEM{R*bbWBbH',
+    'LjIY5?00?bIUofWBWBM{WBofWBj[',
   ];
 
   for (var i = 0; i < hashes.length; ++i) {
-    test("encode blurhash - test picture $i", () {
-      final fileData = File("test/images/test$i.png").readAsBytesSync();
+    test('encode test image "$i" and check equality with blurhash', () {
+      final fileData = File('test/images/test$i.png').readAsBytesSync();
       final image = decodeImage(fileData.toList());
-      final blurHash = encodeBlurHash(
-        image.getBytes(format: Format.rgba),
-        image.width,
-        image.height,
-        numCompX: 4,
-        numpCompY: 3,
-      );
-      expect(blurHash, hashes[i]);
+      final blurHash = BlurHash.encode(image, numCompX: 4, numCompY: 3);
+
+      expect(blurHash.hash, hashes[i]);
     });
   }
 }

@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.0-nullsafety.0] 03.01.21
+
+* Complete refactor
+* Deprecated `encodeBlurHash` and `decodeBlurHash`.
+  Use `BlurHash.encode` and `BlurHash.decode` instead.
+* Initial nullsafe version.
+  Currently only unsound nullsafety supported, because the dependency `image` is not
+  migrated yet.
+
 ## [0.2.3] 22.02.20
 
 * Make the pub.dev analysis tool happy
