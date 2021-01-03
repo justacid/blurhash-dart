@@ -1,45 +1,60 @@
 import 'dart:math';
 
-class Color {
-  Color(this.r, this.g, this.b);
+class ColorTriplet {
+  ColorTriplet(this.r, this.g, this.b);
 
   final double r;
   final double g;
   final double b;
+
+  ColorTriplet operator +(ColorTriplet other) =>
+      ColorTriplet(r + other.r, g + other.g, b + other.b);
+
+  ColorTriplet operator -(ColorTriplet other) =>
+      ColorTriplet(r - other.r, g - other.g, b - other.b);
+
+  ColorTriplet operator *(num scalar) =>
+      ColorTriplet(r * scalar, g * scalar, b * scalar);
+
+  ColorTriplet operator /(num scalar) =>
+      ColorTriplet(r / scalar, g / scalar, b / scalar);
+
+  @override
+  String toString() => 'ColorTriplet($r, $g, $b)';
 }
 
-Color decodeDC(int value) {
+ColorTriplet decodeDC(int value) {
   final r = value >> 16;
   final g = (value >> 8) & 255;
   final b = value & 255;
 
-  return Color(
+  return ColorTriplet(
     sRGBtoLinear(r),
     sRGBtoLinear(g),
     sRGBtoLinear(b),
   );
 }
 
-Color decodeAC(int value, double maxVal) {
+ColorTriplet decodeAC(int value, double maxVal) {
   final r = value / (19.0 * 19.0);
   final g = (value / 19.0) % 19.0;
   final b = value % 19.0;
 
-  return Color(
+  return ColorTriplet(
     signPow((r - 9.0) / 9.0, 2.0) * maxVal,
     signPow((g - 9.0) / 9.0, 2.0) * maxVal,
     signPow((b - 9.0) / 9.0, 2.0) * maxVal,
   );
 }
 
-int encodeDC(Color color) {
+int encodeDC(ColorTriplet color) {
   final r = linearTosRGB(color.r);
   final g = linearTosRGB(color.g);
   final b = linearTosRGB(color.b);
   return (r << 16) + (g << 8) + b;
 }
 
-int encodeAC(Color color, double maxVal) {
+int encodeAC(ColorTriplet color, double maxVal) {
   final r = max(0, min(18, signPow(color.r / maxVal, 0.5) * 9 + 9.5)).floor();
   final g = max(0, min(18, signPow(color.g / maxVal, 0.5) * 9 + 9.5)).floor();
   final b = max(0, min(18, signPow(color.b / maxVal, 0.5) * 9 + 9.5)).floor();
@@ -49,7 +64,7 @@ int encodeAC(Color color, double maxVal) {
 double sRGBtoLinear(int value) {
   final v = value / 255.0;
   if (v <= 0.04045) return v / 12.92;
-  return pow((v + 0.055) / 1.055, 2.4);
+  return pow((v + 0.055) / 1.055, 2.4).toDouble();
 }
 
 int linearTosRGB(double value) {
