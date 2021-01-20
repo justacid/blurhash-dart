@@ -72,9 +72,9 @@ String encodeBlurHash(
   int width,
   int height, {
   int numCompX = 4,
-  int numpCompY = 3,
+  int numCompY = 3,
 }) {
-  if (numCompX < 1 || numCompX > 9 || numpCompY < 1 || numCompX > 9) {
+  if (numCompX < 1 || numCompX > 9 || numCompY < 1 || numCompX > 9) {
     throw BlurHashEncodeException(
       message: "BlurHash components must lie between 1 and 9.",
     );
@@ -87,9 +87,9 @@ String encodeBlurHash(
     );
   }
 
-  final factors = List<Color>(numCompX * numpCompY);
+  final factors = List<Color>(numCompX * numCompY);
   int i = 0;
-  for (var y = 0; y < numpCompY; ++y) {
+  for (var y = 0; y < numCompY; ++y) {
     for (var x = 0; x < numCompX; ++x) {
       final normalisation = (x == 0 && y == 0) ? 1.0 : 2.0;
       final basisFunc = (int i, int j) {
@@ -105,7 +105,7 @@ String encodeBlurHash(
   final ac = factors.skip(1).toList();
 
   final blurHash = StringBuffer();
-  final sizeFlag = (numCompX - 1) + (numpCompY - 1) * 9;
+  final sizeFlag = (numCompX - 1) + (numCompY - 1) * 9;
   blurHash.write(encode83(sizeFlag, 1));
 
   var maxVal = 1.0;

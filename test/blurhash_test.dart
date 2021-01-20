@@ -33,7 +33,7 @@ void main() {
         image.width,
         image.height,
         numCompX: 4,
-        numpCompY: 3,
+        numCompY: 3,
       );
       expect(blurHash, hashes[i]);
     });
