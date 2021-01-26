@@ -9,7 +9,7 @@ void main() {
   test('check if dark picture is dark', () {
     final fileData = File('test/images/darkness_test_0.png').readAsBytesSync();
     final image = decodeImage(fileData.toList());
-    final blurHash = BlurHash.encode(image, numCompX: 4, numCompY: 3);
+    final blurHash = BlurHash.encode(image!, numCompX: 4, numCompY: 3);
 
     expect(blurHash.isDark, true);
     expect(blurHash.isLeftEdgeDark, true);
@@ -25,7 +25,7 @@ void main() {
   test('check if light picture is not dark', () {
     final fileData = File('test/images/darkness_test_1.png').readAsBytesSync();
     final image = decodeImage(fileData.toList());
-    final blurHash = BlurHash.encode(image, numCompX: 4, numCompY: 3);
+    final blurHash = BlurHash.encode(image!, numCompX: 4, numCompY: 3);
 
     expect(blurHash.isDark, false);
     expect(blurHash.isLeftEdgeDark, false);
@@ -41,7 +41,7 @@ void main() {
   test('check if mixed picture is sometimes dark', () {
     final fileData = File('test/images/darkness_test_2.png').readAsBytesSync();
     final image = decodeImage(fileData.toList());
-    final blurHash = BlurHash.encode(image, numCompX: 4, numCompY: 3);
+    final blurHash = BlurHash.encode(image!, numCompX: 4, numCompY: 3);
 
     expect(blurHash.isDark, false);
     expect(blurHash.isLeftEdgeDark, true);
