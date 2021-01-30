@@ -1,4 +1,4 @@
-# Blurhash-Dart Contributors
+# BlurHash-Dart Contributors
 
 * [Robin Alter](https://github.com/robin-alter)
   * Darkness tests and utility functions
