@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import 'package:blurhash_dart/blurhash_dart.dart';
@@ -12,7 +11,7 @@ extension BlurHashUtilExtension on BlurHash {
     final numCompY = components.length;
     final transposedComponents = List.generate(
       numCompX,
-          (i) => List<ColorTriplet>.filled(numCompY, ColorTriplet(0, 0, 0)),
+      (i) => List<ColorTriplet>.filled(numCompY, ColorTriplet(0, 0, 0)),
     );
     for (var j = 0; j < numCompY; j++) {
       for (var i = 0; i < numCompX; i++) {
@@ -27,7 +26,7 @@ extension BlurHashUtilExtension on BlurHash {
     final numCompY = components.length;
     final mirroredComponents = List.generate(
       numCompY,
-          (i) => List<ColorTriplet>.filled(numCompX, ColorTriplet(0, 0, 0)),
+      (i) => List<ColorTriplet>.filled(numCompX, ColorTriplet(0, 0, 0)),
     );
     for (var j = 0; j < numCompY; j++) {
       for (var i = 0; i < numCompX; i++) {
@@ -42,7 +41,7 @@ extension BlurHashUtilExtension on BlurHash {
     final numCompY = components.length;
     final mirroredComponents = List.generate(
       numCompY,
-          (i) => List<ColorTriplet>.filled(numCompX, ColorTriplet(0, 0, 0)),
+      (i) => List<ColorTriplet>.filled(numCompX, ColorTriplet(0, 0, 0)),
     );
     for (var j = 0; j < numCompY; j++) {
       for (var i = 0; i < numCompX; i++) {
@@ -83,10 +82,10 @@ extension BlurHashUtilExtension on BlurHash {
       _getDarkness(_linearRGBAtPos(x, y), threshold);
 
   bool isDiagonalDark(
-      Point<int> topLeftCorner,
-      Point<int> bottomRightCorner, {
-        double? threshold,
-      }) {
+    Point<int> topLeftCorner,
+    Point<int> bottomRightCorner, {
+    double? threshold,
+  }) {
     return _getDarkness(
       _linearRGBAtDiagonal(topLeftCorner, bottomRightCorner),
       threshold,
@@ -146,9 +145,9 @@ extension BlurHashUtilExtension on BlurHash {
   }
 
   ColorTriplet _linearRGBAtDiagonal(
-      Point<int> topLeftCorner,
-      Point<int> bottomRightCorner,
-      ) {
+    Point<int> topLeftCorner,
+    Point<int> bottomRightCorner,
+  ) {
     if (topLeftCorner.x < 0 ||
         topLeftCorner.x >= numCompX ||
         topLeftCorner.y < 0 ||
@@ -177,13 +176,13 @@ extension BlurHashUtilExtension on BlurHash {
         final horizontalAverage = i == 0
             ? 1.0
             : ((sin(pi * i * bottomRightCorner.x) -
-            sin(pi * i * topLeftCorner.x)) /
-            (i * pi * (bottomRightCorner.x - topLeftCorner.x)));
+                    sin(pi * i * topLeftCorner.x)) /
+                (i * pi * (bottomRightCorner.x - topLeftCorner.x)));
         final verticalAverage = j == 0
             ? 1.0
             : ((sin(pi * j * bottomRightCorner.y) -
-            sin(pi * j * topLeftCorner.y)) /
-            (j * pi * (bottomRightCorner.y - topLeftCorner.y)));
+                    sin(pi * j * topLeftCorner.y)) /
+                (j * pi * (bottomRightCorner.y - topLeftCorner.y)));
         sum += components[j][i] * horizontalAverage * verticalAverage;
       }
     }
