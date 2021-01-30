@@ -175,12 +175,12 @@ extension BlurHashUtilExtension on BlurHash {
     for (var j = 0; j < numCompY; j++) {
       for (var i = 0; i < numCompX; i++) {
         final horizontalAverage = i == 0
-            ? 1
+            ? 1.0
             : ((sin(pi * i * bottomRightCorner.x) -
             sin(pi * i * topLeftCorner.x)) /
             (i * pi * (bottomRightCorner.x - topLeftCorner.x)));
         final verticalAverage = j == 0
-            ? 1
+            ? 1.0
             : ((sin(pi * j * bottomRightCorner.y) -
             sin(pi * j * topLeftCorner.y)) /
             (j * pi * (bottomRightCorner.y - topLeftCorner.y)));
