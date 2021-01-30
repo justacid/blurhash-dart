@@ -26,10 +26,10 @@ class BlurHash {
   BlurHash._(
     this.hash,
     this.components,
-    this.numCompX,
-    this.numCompY,
   )   : assert(components.isNotEmpty),
-        assert(components[0].isNotEmpty);
+        assert(components[0].isNotEmpty),
+        numCompY = components.length,
+        numCompX = components[0].length;
 
   /// Construct a [BlurHash] object from decoded components
   /// This is useful for e.g. transposing a BlurHash.
@@ -86,12 +86,7 @@ class BlurHash {
       }
     }
 
-    return BlurHash._(
-      blurHash,
-      _multiplyPunch(components, punch),
-      numCompX,
-      numCompY,
-    );
+    return BlurHash._(blurHash, _multiplyPunch(components, punch));
   }
 
   /// Encodes an image to a BlurHash string
@@ -107,17 +102,16 @@ class BlurHash {
   }) {
     if (numCompX < 1 || numCompX > 9 || numCompY < 1 || numCompX > 9) {
       throw BlurHashEncodeException(
-        'BlurHash components must lie between 1 and 9.',
+        'BlurHash components must be between 1 and 9.',
       );
     }
 
     final data = image.getBytes(format: Format.rgba);
-    final factors = List<ColorTriplet>.filled(
-      numCompX * numCompY,
-      ColorTriplet(0, 0, 0),
+    final components = List.generate(
+      numCompY,
+      (i) => List<ColorTriplet>.filled(numCompX, ColorTriplet(0, 0, 0)),
     );
 
-    var i = 0;
     for (var y = 0; y < numCompY; ++y) {
       for (var x = 0; x < numCompX; ++x) {
         final normalisation = (x == 0 && y == 0) ? 1.0 : 2.0;
@@ -126,12 +120,13 @@ class BlurHash {
               cos((pi * x * i) / image.width) *
               cos((pi * y * j) / image.height);
         };
-        factors[i++] =
+        components[y][x] =
             _multiplyBasisFunction(data, image.width, image.height, basisFunc);
       }
     }
 
-    return BlurHash.decode(_encodeFactors(factors, numCompX, numCompY));
+    final hash = _encodeComponents(components);
+    return BlurHash._(hash, components);
   }
 
   /// Construct a [BlurHash] with a single color.
@@ -161,7 +156,7 @@ class BlurHash {
   Image toImage(int width, int height) {
     assert(width > 0);
     assert(height > 0);
-    final data = _transform(width, height, numCompX, numCompY, components);
+    final data = _transform(width, height, components);
     return Image.fromBytes(width, height, data, format: Format.rgba);
   }
 }
@@ -260,8 +255,6 @@ List<List<ColorTriplet>> _multiplyPunch(
 Uint8List _transform(
   int width,
   int height,
-  int numCompX,
-  int numCompY,
   List<List<ColorTriplet>> components,
 ) {
   final pixels = List<int>.filled(width * height * 4, 0);
@@ -273,8 +266,8 @@ Uint8List _transform(
       var g = 0.0;
       var b = 0.0;
 
-      for (var j = 0; j < numCompY; ++j) {
-        for (var i = 0; i < numCompX; ++i) {
+      for (var j = 0; j < components.length; ++j) {
+        for (var i = 0; i < components[0].length; ++i) {
           final basis = cos(pi * x * i / width) * cos(pi * y * j / height);
           final color = components[j][i];
           r += color.r * basis;
