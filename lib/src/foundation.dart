@@ -1,7 +1,7 @@
 import 'dart:math';
 
 class ColorTriplet {
-  ColorTriplet(this.r, this.g, this.b);
+  const ColorTriplet(this.r, this.g, this.b);
 
   final double r;
   final double g;
@@ -13,10 +13,10 @@ class ColorTriplet {
   ColorTriplet operator -(ColorTriplet other) =>
       ColorTriplet(r - other.r, g - other.g, b - other.b);
 
-  ColorTriplet operator *(num scalar) =>
+  ColorTriplet operator *(double scalar) =>
       ColorTriplet(r * scalar, g * scalar, b * scalar);
 
-  ColorTriplet operator /(num scalar) =>
+  ColorTriplet operator /(double scalar) =>
       ColorTriplet(r / scalar, g / scalar, b / scalar);
 
   @override
