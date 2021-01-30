@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:blurhash_dart/blurhash_dart.dart';
-import 'package:blurhash_dart/blurhash_utils.dart';
+import 'package:blurhash_dart/blurhash_extensions.dart';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 

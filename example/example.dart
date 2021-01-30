@@ -1,5 +1,5 @@
 import 'package:blurhash_dart/blurhash_dart.dart';
-import 'package:blurhash_dart/blurhash_utils.dart';
+import 'package:blurhash_dart/blurhash_extensions.dart';
 
 void main() {
   const hash = 'LEHV6nWB2yk8pyo0adR*.7kCMdnj';
