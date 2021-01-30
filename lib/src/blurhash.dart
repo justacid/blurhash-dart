@@ -31,7 +31,7 @@ class BlurHash {
         numCompY = components.length,
         numCompX = components[0].length;
 
-  /// Construct a [BlurHash] object from decoded components
+  /// Construct a [BlurHash] object from decoded components.
   /// This is useful for e.g. transposing a BlurHash.
   BlurHash.components(this.components)
       : assert(components.isNotEmpty),
@@ -40,7 +40,7 @@ class BlurHash {
         numCompX = components[0].length,
         numCompY = components.length;
 
-  /// Decode a BlurHash String to a BlurHash object
+  /// Decode a BlurHash String to a BlurHash object.
   ///
   /// The [punch] parameter adjusts the contrast on the decoded image. Values
   /// less than 1 will make the effect more subtle, larger values will make the
@@ -73,11 +73,11 @@ class BlurHash {
     for (var j = 0; j < numCompY; j++) {
       for (var i = 0; i < numCompX; i++) {
         if (i == 0 && j == 0) {
-          final value = decodeDC(decode83(blurHash, 2, 6));
+          final value = decodeDc(decode83(blurHash, 2, 6));
           components[j][i] = value;
         } else {
           final index = i + j * numCompX;
-          final value = decodeAC(
+          final value = decodeAc(
             decode83(blurHash, 4 + index * 2, (4 + index * 2) + 2),
             maxAc,
           );
@@ -89,7 +89,7 @@ class BlurHash {
     return BlurHash._(blurHash, _multiplyPunch(components, punch));
   }
 
-  /// Encodes an image to a BlurHash string
+  /// Encodes an image to a BlurHash string.
   ///
   /// The parameters [numCompX] and [numCompY] are the number of components of
   /// the BlurHash. Both parameters must be between 1 and 9. Throws a
@@ -138,9 +138,9 @@ class BlurHash {
     assert(blue >= 0 && blue <= 255);
 
     final color = ColorTriplet(
-      sRGBtoLinear(red),
-      sRGBtoLinear(green),
-      sRGBtoLinear(blue),
+      sRgbToLinear(red),
+      sRgbToLinear(green),
+      sRgbToLinear(blue),
     );
 
     return BlurHash.components([
@@ -176,6 +176,7 @@ Uint8List decodeBlurHash(
 
 /// Deprecated. Please use [BlurHash.encode] instead.
 /// Encodes an image to a BlurHash string
+@deprecated
 String encodeBlurHash(
   Uint8List data,
   int width,
@@ -231,9 +232,9 @@ String _encodeFactors(
     blurHash.write(encode83(0, 1));
   }
 
-  blurHash.write(encode83(encodeDC(dc), 4));
+  blurHash.write(encode83(encodeDc(dc), 4));
   for (final factor in ac) {
-    blurHash.write(encode83(encodeAC(factor, maxVal), 2));
+    blurHash.write(encode83(encodeAc(factor, maxVal), 2));
   }
   return blurHash.toString();
 }
@@ -276,9 +277,9 @@ Uint8List _transform(
         }
       }
 
-      pixels[pixel++] = linearTosRGB(r);
-      pixels[pixel++] = linearTosRGB(g);
-      pixels[pixel++] = linearTosRGB(b);
+      pixels[pixel++] = linearTosRgb(r);
+      pixels[pixel++] = linearTosRgb(g);
+      pixels[pixel++] = linearTosRgb(b);
       pixels[pixel++] = 255;
     }
   }
@@ -301,9 +302,9 @@ ColorTriplet _multiplyBasisFunction(
   for (var x = 0; x < width; ++x) {
     for (var y = 0; y < height; ++y) {
       final basis = basisFunction(x, y);
-      r += basis * sRGBtoLinear(pixels[4 * x + 0 + y * bytesPerRow]);
-      g += basis * sRGBtoLinear(pixels[4 * x + 1 + y * bytesPerRow]);
-      b += basis * sRGBtoLinear(pixels[4 * x + 2 + y * bytesPerRow]);
+      r += basis * sRgbToLinear(pixels[4 * x + 0 + y * bytesPerRow]);
+      g += basis * sRgbToLinear(pixels[4 * x + 1 + y * bytesPerRow]);
+      b += basis * sRgbToLinear(pixels[4 * x + 2 + y * bytesPerRow]);
     }
   }
 
