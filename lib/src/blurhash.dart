@@ -8,21 +8,21 @@ import 'exception.dart';
 import 'foundation.dart';
 
 class BlurHash {
-  /// The actual BlurHash string
+  /// The actual BlurHash string.
   final String hash;
 
-  /// The decoded components of the BlurHash
+  /// The decoded components of the BlurHash.
   /// This is mostly useful for e.g. transposing a BlurHash.
   final List<List<ColorTriplet>> components;
 
-  /// The number of horizontal BlurHash components
+  /// The number of horizontal BlurHash components.
   final int numCompX;
 
-  /// The number of vertical BlurHash components
+  /// The number of vertical BlurHash components.
   final int numCompY;
 
   /// Private constructor used in the actual factory constructors.
-  /// See [BlurHash.decode].
+  /// See [BlurHash.decode] and [BlurHash.encode].
   BlurHash._(
     this.hash,
     this.components,
@@ -97,7 +97,7 @@ class BlurHash {
   /// Encodes an image to a BlurHash string
   ///
   /// The parameters [numCompX] and [numCompY] are the number of components of
-  /// the BlurHash. Both parameters must lie between 1 and 9. Throws a
+  /// the BlurHash. Both parameters must be between 1 and 9. Throws a
   /// [BlurHashEncodeException] when [numCompX] and [numCompY] are not in
   /// the expected range.
   factory BlurHash.encode(
@@ -168,17 +168,6 @@ class BlurHash {
 
 /// Deprecated. Please use [BlurHash.decode] and [BlurHash.toImage] instead.
 /// Decode a BlurHash to raw pixels in RGBA32 format
-///
-/// Decodes a [blurHash] to raw pixels in RGBA32 format with specified [width]
-/// and /// [height]. Both [width] and [height] must not be null and greater
-/// than 0. It is recommended to keep the [width] and [height] small and let
-/// the UI layer handle upscaling for better performance.
-///
-/// The [punch] parameter adjusts the contrast on the decoded image. Values
-/// less than 1 will make the effect more subtle, larger values will make the
-/// effect stronger. This is a design parameter to adjust the look.
-///
-/// Throws [BlurHashDecodeException] when an invalid BlurHash is encountered.
 @deprecated
 Uint8List decodeBlurHash(
   String blurHash,
@@ -192,17 +181,6 @@ Uint8List decodeBlurHash(
 
 /// Deprecated. Please use [BlurHash.encode] instead.
 /// Encodes an image to a BlurHash string
-///
-/// The format of the given [data] array is expected to be raw pixels in
-/// RGBA32 format - without any additional image headers. The [width] and
-/// [height] are the dimensions of the given image. Parameters [numCompX] and
-/// [numCompY] are the components of the BlurHash. Both parameters must lie
-/// between 1 and 9.
-///
-/// Throws [BlurHashEncodeException] when [numCompX] and [numCompY] do not lie
-/// within the expected range. Also throws [BlurHashEncodeException] when the
-/// [data] array is not in the expected RGBA32 format.
-@deprecated
 String encodeBlurHash(
   Uint8List data,
   int width,
