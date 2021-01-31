@@ -1,8 +1,7 @@
 # BlurHash Dart
 
-A pure dart implementation of BlurHash without any external dependencies (except for
-running tests) for maximum flexibility. Supports encoding and decoding. See
-[BlurHash](https://blurha.sh/) website or [GitHub
+A pure dart implementation of BlurHash. Supports both encoding and decoding. Runs on
+every supported Dart platform. See the [BlurHash](https://blurha.sh/) website or [GitHub
 repository](https://github.com/woltapp/blurhash) for more information.
 
 The encoder of this dart implementation produces slightly different hashes than the
@@ -15,24 +14,32 @@ practice this should not be relevant.
 
 ```dart
 import 'package:blurhash_dart/blurhash_dart.dart';
-import 'package:image/image.dart';
+import 'package:image/image.dart' as img;
 
-String hash = 'LEHV6nWB2yk8pyo0adR*.7kCMdnj';
+const hash = 'LEHV6nWB2yk8pyo0adR*.7kCMdnj';
 BlurHash blurHash = BlurHash.decode(hash);
-Image image = blurHash.toImage(35, 20);
+img.Image image = blurHash.toImage(35, 20);
 
-print(blurHash.hash);
+// Display image...
 ```
 
-### Encoding a BlurHash
+### Encoding an Image
 
 ```dart
-import 'package:blurhash_dart/blurhash_dart.dart';
-import 'package:image/image.dart';
+import 'dart:io';
 
-Uint8List fileData = File("some_image.png").readAsBytesSync();
-Image image = decodeImage(fileData.toList());
-BlurHash blurHash = BlurHash.encode(image.getBytes(format: Format.rgba));
+import 'package:blurhash_dart/blurhash_dart.dart';
+import 'package:image/image.dart' as img;
+
+final data = File('path/to/image.png').readAsBytesSync();
+final image = img.decodeImage(data.toList());
+final blurHash = BlurHash.encode(image!, numCompX: 4, numCompY: 3);
 
 print(blurHash.hash);
 ```
+
+### Extension Methods
+
+Additional extension methods to compute, for example color averages, are available
+when importing `package:blurhash_dart/blurhash_extensions.dart`. See example for
+basic usage.
