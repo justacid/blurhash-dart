@@ -1,5 +1,5 @@
 name: blurhash_dart
-version: 1.0.0-nullsafety.0
+version: 1.0.0
 homepage: https://github.com/justacid/blurhash-dart
 description: >
   A pure dart implementation of the BlurHash algorithm.
@@ -7,10 +7,10 @@ description: >
   as well as some utility extensions.
 
 environment:
-  sdk: ">=2.12.0-0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
-  image: ^3.0.0-nullsafety.0
+  image: ^3.0.1
 
 dev_dependencies:
-  test: ^1.16.0-nullsafety.13
+  test: ^1.16.5

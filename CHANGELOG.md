@@ -1,12 +1,11 @@
 # Changelog
 
-## [1.0.0-nullsafety.0]
+## [1.0.0]
 
+* Migrated to null-safety
 * **Deprecated**: `encodeBlurHash` and `decodeBlurHash` are now deprecated
   Please use `BlurHash.encode` and `BlurHash.decode` instead
-* Complete refactor
 * Added BlurHash extension methods
-* Initial nullsafe version
 
 ## [0.2.3]
 
