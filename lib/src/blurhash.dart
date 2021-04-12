@@ -100,7 +100,7 @@ class BlurHash {
     int numCompX = 4,
     int numCompY = 3,
   }) {
-    if (numCompX < 1 || numCompX > 9 || numCompY < 1 || numCompX > 9) {
+    if (numCompX < 1 || numCompX > 9 || numCompY < 1 || numCompY > 9) {
       throw BlurHashEncodeException(
         'BlurHash components must be between 1 and 9.',
       );
