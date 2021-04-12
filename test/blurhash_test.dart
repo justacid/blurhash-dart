@@ -36,6 +36,46 @@ void main() {
       expect(blurHash.hash, hashes[i]);
     });
   }
+
+  test('decode throws on invalid blurhashes', () {
+    expect(
+      () => BlurHash.decode(''),
+      throwsA(TypeMatcher<BlurHashDecodeException>()),
+    );
+    expect(
+      () => BlurHash.decode('abcdef'),
+      throwsA(TypeMatcher<BlurHashDecodeException>()),
+    );
+    expect(
+      () => BlurHash.decode('LEHV6nBk8'),
+      throwsA(TypeMatcher<BlurHashDecodeException>()),
+    );
+    expect(
+      () => BlurHash.decode('LEHV6nWB2yk8pyo0adR*.7kCMdnä'),
+      throwsA(TypeMatcher<BlurHashDecodeException>()),
+    );
+  });
+
+  test('encode throws on invalid number of components', () {
+    final fileData = File('test/images/test0.png').readAsBytesSync();
+    final image = decodeImage(fileData.toList())!;
+    expect(
+      () => BlurHash.encode(image, numCompX: 0),
+      throwsA(TypeMatcher<BlurHashEncodeException>()),
+    );
+    expect(
+      () => BlurHash.encode(image, numCompX: 10),
+      throwsA(TypeMatcher<BlurHashEncodeException>()),
+    );
+    expect(
+      () => BlurHash.encode(image, numCompY: 0),
+      throwsA(TypeMatcher<BlurHashEncodeException>()),
+    );
+    expect(
+      () => BlurHash.encode(image, numCompY: 10),
+      throwsA(TypeMatcher<BlurHashEncodeException>()),
+    );
+  });
 }
 
 const _decoded = [
