@@ -23,6 +23,22 @@ img.Image image = blurHash.toImage(35, 20);
 // Display image...
 ```
 
+#### Note: Usage with Flutter
+
+Flutter does not expect raw bytes for its `Image.memory` widget, but fully encoded
+images with their corresponding headers (e.g. bitmap, jpg, png). The easiest way to
+accomplish this, is to use, for example, `encodeJpg` from `package:image`:
+
+```dart
+Widget build(BuildContext context) {
+  final image = BlurHash.decode('LEHV6nWB2yk8pyo0adR*.7kCMdnj').toImage(35, 20);
+  return Image.memory(Uint8List.fromList(encodeJpg(image)));
+}
+```
+
+It is recommended to cache the resulting image in a stateful widget, such that it
+does not need to be recomputed on every build call.
+
 ### Encoding an Image
 
 ```dart
