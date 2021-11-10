@@ -1,10 +1,16 @@
 # Changelog
 
+## [1.1.0]
+
+* Improve performance of `BlurHash.encode`
+
 ## [1.0.2]
+
 * Add note in readme on usage with Flutter
-* Fix incorrect precondition in `Blurhash.encode`
+* Fix incorrect precondition in `BlurHash.encode`
 
 ## [1.0.1]
+
 * Fix missing export for exception types
 
 ## [1.0.0]

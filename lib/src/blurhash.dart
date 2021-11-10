@@ -115,13 +115,8 @@ class BlurHash {
     for (var y = 0; y < numCompY; ++y) {
       for (var x = 0; x < numCompX; ++x) {
         final normalisation = (x == 0 && y == 0) ? 1.0 : 2.0;
-        final basisFunc = (int i, int j) {
-          return normalisation *
-              cos((pi * x * i) / image.width) *
-              cos((pi * y * j) / image.height);
-        };
-        components[y][x] =
-            _multiplyBasisFunction(data, image.width, image.height, basisFunc);
+        components[y][x] = _multiplyBasisFunction(
+            data, image.width, image.height, x, y, normalisation);
       }
     }
 
@@ -291,7 +286,9 @@ ColorTriplet _multiplyBasisFunction(
   Uint8List pixels,
   int width,
   int height,
-  double Function(int i, int j) basisFunction,
+  int x,
+  int y,
+  double normalisation,
 ) {
   var r = 0.0;
   var g = 0.0;
@@ -299,12 +296,14 @@ ColorTriplet _multiplyBasisFunction(
 
   final bytesPerRow = width * 4;
 
-  for (var x = 0; x < width; ++x) {
-    for (var y = 0; y < height; ++y) {
-      final basis = basisFunction(x, y);
-      r += basis * sRgbToLinear(pixels[4 * x + 0 + y * bytesPerRow]);
-      g += basis * sRgbToLinear(pixels[4 * x + 1 + y * bytesPerRow]);
-      b += basis * sRgbToLinear(pixels[4 * x + 2 + y * bytesPerRow]);
+  for (var i = 0; i < width; ++i) {
+    for (var j = 0; j < height; ++j) {
+      final basis = normalisation *
+          cos((pi * x * i) / width) *
+          cos((pi * y * j) / height);
+      r += basis * sRgbToLinear(pixels[4 * i + 0 + j * bytesPerRow]);
+      g += basis * sRgbToLinear(pixels[4 * i + 1 + j * bytesPerRow]);
+      b += basis * sRgbToLinear(pixels[4 * i + 2 + j * bytesPerRow]);
     }
   }
 
