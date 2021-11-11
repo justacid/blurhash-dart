@@ -158,7 +158,7 @@ class BlurHash {
 
 /// Deprecated. Please use [BlurHash.decode] and [BlurHash.toImage] instead.
 /// Decode a BlurHash to raw pixels in RGBA32 format
-@deprecated
+@Deprecated('Use [BlurHash.decode] instead.')
 Uint8List decodeBlurHash(
   String blurHash,
   int width,
@@ -171,7 +171,7 @@ Uint8List decodeBlurHash(
 
 /// Deprecated. Please use [BlurHash.encode] instead.
 /// Encodes an image to a BlurHash string
-@deprecated
+@Deprecated('Use [BlurHash.encode] instead.')
 String encodeBlurHash(
   Uint8List data,
   int width,
@@ -217,9 +217,7 @@ String _encodeFactors(
 
   var maxVal = 1.0;
   if (ac.isNotEmpty) {
-    final maxElem =
-        (ColorTriplet c) => max(c.r.abs(), max(c.g.abs(), c.b.abs()));
-    final actualMax = ac.map(maxElem).reduce(max);
+    final actualMax = ac.map(_maxChannelAbs).reduce(max);
     final quantisedMax = max(0, min(82, (actualMax * 166.0 - 0.5).floor()));
     maxVal = (quantisedMax + 1.0) / 166.0;
     blurHash.write(encode83(quantisedMax, 1));
@@ -232,6 +230,10 @@ String _encodeFactors(
     blurHash.write(encode83(encodeAc(factor, maxVal), 2));
   }
   return blurHash.toString();
+}
+
+double _maxChannelAbs(ColorTriplet c) {
+  return max(c.r.abs(), max(c.g.abs(), c.b.abs()));
 }
 
 List<List<ColorTriplet>> _multiplyPunch(
