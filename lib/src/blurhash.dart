@@ -337,12 +337,11 @@ ColorTriplet _multiplyBasisFunction(
         final basis = normalisation *
             cos((pi * x * i) / width) *
             cos((pi * y * j) / height);
-        r += basis *
+        final v = basis *
             sRgbToLinear(pixels[channelOrderLength * i + 0 + j * bytesPerRow]);
-        g += basis *
-            sRgbToLinear(pixels[channelOrderLength * i + 0 + j * bytesPerRow]);
-        b += basis *
-            sRgbToLinear(pixels[channelOrderLength * i + 0 + j * bytesPerRow]);
+        r += v;
+        g += v;
+        b += v;
       }
     }
   }
