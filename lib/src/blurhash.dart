@@ -18,6 +18,8 @@ class BlurHash {
   /// The number of horizontal BlurHash components.
   final int numCompX;
 
+  final int? numChannels;
+
   /// The number of vertical BlurHash components.
   final int numCompY;
 
@@ -26,6 +28,7 @@ class BlurHash {
   BlurHash._(
     this.hash,
     this.components,
+    this.numChannels,
   )   : assert(components.isNotEmpty),
         assert(components[0].isNotEmpty),
         numCompY = components.length,
@@ -37,6 +40,7 @@ class BlurHash {
       : assert(components.isNotEmpty),
         assert(components[0].isNotEmpty),
         hash = _encodeComponents(components),
+        numChannels = -1,
         numCompX = components[0].length,
         numCompY = components.length;
 
@@ -86,7 +90,7 @@ class BlurHash {
       }
     }
 
-    return BlurHash._(blurHash, _multiplyPunch(components, punch));
+    return BlurHash._(blurHash, _multiplyPunch(components, punch), null);
   }
 
   /// Encodes an image to a BlurHash string.
@@ -105,8 +109,7 @@ class BlurHash {
         'BlurHash components must be between 1 and 9.',
       );
     }
-
-    final data = image.getBytes(format: Format.rgba);
+    final data = image.getBytes();
     final components = List.generate(
       numCompY,
       (i) => List<ColorTriplet>.filled(numCompX, ColorTriplet(0, 0, 0)),
@@ -116,12 +119,19 @@ class BlurHash {
       for (var x = 0; x < numCompX; ++x) {
         final normalisation = (x == 0 && y == 0) ? 1.0 : 2.0;
         components[y][x] = _multiplyBasisFunction(
-            data, image.width, image.height, x, y, normalisation);
+          data,
+          image.width,
+          image.height,
+          x,
+          y,
+          normalisation,
+          image.numChannels,
+        );
       }
     }
 
     final hash = _encodeComponents(components);
-    return BlurHash._(hash, components);
+    return BlurHash._(hash, components, image.numChannels);
   }
 
   /// Construct a [BlurHash] with a single color.
@@ -152,7 +162,11 @@ class BlurHash {
     assert(width > 0);
     assert(height > 0);
     final data = _transform(width, height, components);
-    return Image.fromBytes(width, height, data, format: Format.rgba);
+    return Image.fromBytes(
+      width: width,
+      height: height,
+      bytes: data.buffer,
+    );
   }
 }
 
@@ -166,7 +180,7 @@ Uint8List decodeBlurHash(
   double punch = 1.0,
 }) {
   final hash = BlurHash.decode(blurHash, punch: punch);
-  return hash.toImage(width, height).getBytes(format: Format.rgba);
+  return hash.toImage(width, height).getBytes();
 }
 
 /// Deprecated. Please use [BlurHash.encode] instead.
@@ -177,10 +191,14 @@ String encodeBlurHash(
   int width,
   int height, {
   int numCompX = 4,
-  int numpCompY = 3,
+  int numCompY = 3,
 }) {
-  final image = Image.fromBytes(width, height, data, format: Format.rgba);
-  final hash = BlurHash.encode(image, numCompX: numCompX, numCompY: numpCompY);
+  final image = Image.fromBytes(
+    width: width,
+    height: height,
+    bytes: data.buffer,
+  );
+  final hash = BlurHash.encode(image, numCompX: numCompX, numCompY: numCompY);
   return hash.hash;
 }
 
@@ -291,21 +309,41 @@ ColorTriplet _multiplyBasisFunction(
   int x,
   int y,
   double normalisation,
+  int channelOrderLength,
 ) {
   var r = 0.0;
   var g = 0.0;
   var b = 0.0;
 
-  final bytesPerRow = width * 4;
+  final bytesPerRow = width * channelOrderLength;
 
-  for (var i = 0; i < width; ++i) {
-    for (var j = 0; j < height; ++j) {
-      final basis = normalisation *
-          cos((pi * x * i) / width) *
-          cos((pi * y * j) / height);
-      r += basis * sRgbToLinear(pixels[4 * i + 0 + j * bytesPerRow]);
-      g += basis * sRgbToLinear(pixels[4 * i + 1 + j * bytesPerRow]);
-      b += basis * sRgbToLinear(pixels[4 * i + 2 + j * bytesPerRow]);
+  if (channelOrderLength == 3 || channelOrderLength == 4) {
+    for (var i = 0; i < width; ++i) {
+      for (var j = 0; j < height; ++j) {
+        final basis = normalisation *
+            cos((pi * x * i) / width) *
+            cos((pi * y * j) / height);
+        r += basis *
+            sRgbToLinear(pixels[channelOrderLength * i + 0 + j * bytesPerRow]);
+        g += basis *
+            sRgbToLinear(pixels[channelOrderLength * i + 1 + j * bytesPerRow]);
+        b += basis *
+            sRgbToLinear(pixels[channelOrderLength * i + 2 + j * bytesPerRow]);
+      }
+    }
+  } else if (channelOrderLength == 2) {
+    for (var i = 0; i < width; ++i) {
+      for (var j = 0; j < height; ++j) {
+        final basis = normalisation *
+            cos((pi * x * i) / width) *
+            cos((pi * y * j) / height);
+        r += basis *
+            sRgbToLinear(pixels[channelOrderLength * i + 0 + j * bytesPerRow]);
+        g += basis *
+            sRgbToLinear(pixels[channelOrderLength * i + 0 + j * bytesPerRow]);
+        b += basis *
+            sRgbToLinear(pixels[channelOrderLength * i + 0 + j * bytesPerRow]);
+      }
     }
   }
 
