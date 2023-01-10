@@ -166,6 +166,7 @@ class BlurHash {
       width: width,
       height: height,
       bytes: data.buffer,
+      numChannels: 4,
     );
   }
 }
