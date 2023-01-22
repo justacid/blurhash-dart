@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.0]
+
+* Update image dependency to >=4.0.8
+
 ## [1.1.0]
 
 * Improve performance of `BlurHash.encode`
