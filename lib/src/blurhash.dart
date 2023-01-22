@@ -105,6 +105,7 @@ class BlurHash {
         'BlurHash components must be between 1 and 9.',
       );
     }
+
     final data = image.getBytes();
     final components = List.generate(
       numCompY,
