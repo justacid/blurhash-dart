@@ -18,8 +18,6 @@ class BlurHash {
   /// The number of horizontal BlurHash components.
   final int numCompX;
 
-  final int? numChannels;
-
   /// The number of vertical BlurHash components.
   final int numCompY;
 
@@ -28,7 +26,6 @@ class BlurHash {
   BlurHash._(
     this.hash,
     this.components,
-    this.numChannels,
   )   : assert(components.isNotEmpty),
         assert(components[0].isNotEmpty),
         numCompY = components.length,
@@ -40,7 +37,6 @@ class BlurHash {
       : assert(components.isNotEmpty),
         assert(components[0].isNotEmpty),
         hash = _encodeComponents(components),
-        numChannels = -1,
         numCompX = components[0].length,
         numCompY = components.length;
 
@@ -90,7 +86,7 @@ class BlurHash {
       }
     }
 
-    return BlurHash._(blurHash, _multiplyPunch(components, punch), null);
+    return BlurHash._(blurHash, _multiplyPunch(components, punch));
   }
 
   /// Encodes an image to a BlurHash string.
@@ -131,7 +127,7 @@ class BlurHash {
     }
 
     final hash = _encodeComponents(components);
-    return BlurHash._(hash, components, image.numChannels);
+    return BlurHash._(hash, components);
   }
 
   /// Construct a [BlurHash] with a single color.
