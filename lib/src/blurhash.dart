@@ -188,14 +188,14 @@ String encodeBlurHash(
   int width,
   int height, {
   int numCompX = 4,
-  int numCompY = 3,
+  int numpCompY = 3,
 }) {
   final image = Image.fromBytes(
     width: width,
     height: height,
     bytes: data.buffer,
   );
-  final hash = BlurHash.encode(image, numCompX: numCompX, numCompY: numCompY);
+  final hash = BlurHash.encode(image, numCompX: numCompX, numCompY: numpCompY);
   return hash.hash;
 }
 
