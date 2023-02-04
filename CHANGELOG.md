@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.2.1]
+
+* Fix crash for some specific `Image`s by using an pixel iterator
+  instead of raw byte access.
+
 ## [1.2.0]
 
 * Update image dependency to >=4.0.8

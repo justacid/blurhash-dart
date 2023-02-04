@@ -1,5 +1,5 @@
 name: blurhash_dart
-version: 1.2.0
+version: 1.2.1
 homepage: https://github.com/justacid/blurhash-dart
 description: >
   A pure dart implementation of the BlurHash algorithm.
