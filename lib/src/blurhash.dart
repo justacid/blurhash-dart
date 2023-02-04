@@ -106,7 +106,6 @@ class BlurHash {
       );
     }
 
-    final data = image.getBytes();
     final components = List.generate(
       numCompY,
       (i) => List<ColorTriplet>.filled(numCompX, ColorTriplet(0, 0, 0)),
@@ -115,20 +114,11 @@ class BlurHash {
     for (var y = 0; y < numCompY; ++y) {
       for (var x = 0; x < numCompX; ++x) {
         final normalisation = (x == 0 && y == 0) ? 1.0 : 2.0;
-        components[y][x] = _multiplyBasisFunction(
-          data,
-          image.width,
-          image.height,
-          x,
-          y,
-          normalisation,
-          image.numChannels,
-        );
+        components[y][x] = _multiplyBasisFunction(image, x, y, normalisation);
       }
     }
 
-    final hash = _encodeComponents(components);
-    return BlurHash._(hash, components);
+    return BlurHash._(_encodeComponents(components), components);
   }
 
   /// Construct a [BlurHash] with a single color.
@@ -301,49 +291,41 @@ Uint8List _transform(
 }
 
 ColorTriplet _multiplyBasisFunction(
-  Uint8List pixels,
-  int width,
-  int height,
+  Image image,
   int x,
   int y,
   double normalisation,
-  int channelOrderLength,
 ) {
   var r = 0.0;
   var g = 0.0;
   var b = 0.0;
 
-  final bytesPerRow = width * channelOrderLength;
+  final img = image.convert(format: Format.uint8);
 
-  if (channelOrderLength == 3 || channelOrderLength == 4) {
-    for (var i = 0; i < width; ++i) {
-      for (var j = 0; j < height; ++j) {
-        final basis = normalisation *
-            cos((pi * x * i) / width) *
-            cos((pi * y * j) / height);
-        r += basis *
-            sRgbToLinear(pixels[channelOrderLength * i + 0 + j * bytesPerRow]);
-        g += basis *
-            sRgbToLinear(pixels[channelOrderLength * i + 1 + j * bytesPerRow]);
-        b += basis *
-            sRgbToLinear(pixels[channelOrderLength * i + 2 + j * bytesPerRow]);
-      }
+  if (img.numChannels >= 3) {
+    for (final pixel in img) {
+      final basis = normalisation *
+          cos((pi * x * pixel.x) / img.width) *
+          cos((pi * y * pixel.y) / img.height);
+
+      r += basis * sRgbToLinear(pixel.r as int);
+      g += basis * sRgbToLinear(pixel.g as int);
+      b += basis * sRgbToLinear(pixel.b as int);
     }
-  } else if (channelOrderLength == 2) {
-    for (var i = 0; i < width; ++i) {
-      for (var j = 0; j < height; ++j) {
-        final basis = normalisation *
-            cos((pi * x * i) / width) *
-            cos((pi * y * j) / height);
-        final v = basis *
-            sRgbToLinear(pixels[channelOrderLength * i + 0 + j * bytesPerRow]);
-        r += v;
-        g += v;
-        b += v;
-      }
+  } else {
+    for (final pixel in img) {
+      final basis = normalisation *
+          cos((pi * x * pixel.x) / img.width) *
+          cos((pi * y * pixel.y) / img.height);
+
+      final value = sRgbToLinear(pixel.r as int);
+
+      r += basis * value;
+      g += basis * value;
+      b += basis * value;
     }
   }
 
-  final scale = 1.0 / (width * height);
+  final scale = 1.0 / (img.width * img.height);
   return ColorTriplet(r * scale, g * scale, b * scale);
 }
