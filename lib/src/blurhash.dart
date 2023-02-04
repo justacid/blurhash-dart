@@ -106,6 +106,7 @@ class BlurHash {
       );
     }
 
+    final img = image.convert(format: Format.uint8);
     final components = List.generate(
       numCompY,
       (i) => List<ColorTriplet>.filled(numCompX, ColorTriplet(0, 0, 0)),
@@ -114,7 +115,7 @@ class BlurHash {
     for (var y = 0; y < numCompY; ++y) {
       for (var x = 0; x < numCompX; ++x) {
         final normalisation = (x == 0 && y == 0) ? 1.0 : 2.0;
-        components[y][x] = _multiplyBasisFunction(image, x, y, normalisation);
+        components[y][x] = _multiplyBasisFunction(img, x, y, normalisation);
       }
     }
 
@@ -300,23 +301,21 @@ ColorTriplet _multiplyBasisFunction(
   var g = 0.0;
   var b = 0.0;
 
-  final img = image.convert(format: Format.uint8);
-
-  if (img.numChannels >= 3) {
-    for (final pixel in img) {
+  if (image.numChannels >= 3) {
+    for (final pixel in image) {
       final basis = normalisation *
-          cos((pi * x * pixel.x) / img.width) *
-          cos((pi * y * pixel.y) / img.height);
+          cos((pi * x * pixel.x) / image.width) *
+          cos((pi * y * pixel.y) / image.height);
 
       r += basis * sRgbToLinear(pixel.r as int);
       g += basis * sRgbToLinear(pixel.g as int);
       b += basis * sRgbToLinear(pixel.b as int);
     }
   } else {
-    for (final pixel in img) {
+    for (final pixel in image) {
       final basis = normalisation *
-          cos((pi * x * pixel.x) / img.width) *
-          cos((pi * y * pixel.y) / img.height);
+          cos((pi * x * pixel.x) / image.width) *
+          cos((pi * y * pixel.y) / image.height);
 
       final value = sRgbToLinear(pixel.r as int);
 
@@ -326,6 +325,6 @@ ColorTriplet _multiplyBasisFunction(
     }
   }
 
-  final scale = 1.0 / (img.width * img.height);
+  final scale = 1.0 / (image.width * image.height);
   return ColorTriplet(r * scale, g * scale, b * scale);
 }
