@@ -48,8 +48,8 @@ ColorTriplet decodeDc(int value) {
 }
 
 ColorTriplet decodeAc(int value, double maxVal) {
-  final r = value / (19.0 * 19.0);
-  final g = (value / 19.0) % 19.0;
+  final r = (value / (19 * 19)).floor();
+  final g = (value / 19).floor() % 19;
   final b = value % 19.0;
 
   return ColorTriplet(
